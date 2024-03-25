@@ -9,15 +9,19 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
 /**
  * Represents the result of an air cooling process.
  */
-public record AirCoolingResult(FlowOfHumidAir outletAirFlow,
-                               Power heatOfProcess,
-                               FlowOfLiquidWater condensateFlow,
-                               BypassFactor bypassFactor) implements ProcessResult {
+public record AirCoolingNodeResult(FlowOfHumidAir outletAirFlow,
+                                   Power heatOfProcess,
+                                   FlowOfLiquidWater condensateFlow,
+                                   FlowOfLiquidWater coolantSupplyFlow,
+                                   FlowOfLiquidWater coolantReturnFlow,
+                                   BypassFactor bypassFactor) implements ProcessResult {
 
     public static class Builder {
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess;
         private FlowOfLiquidWater condensateFlow;
+        private FlowOfLiquidWater coolantSupplyFlow;
+        private FlowOfLiquidWater coolantReturnFlow;
         private BypassFactor bypassFactor;
 
         public Builder outletAirFlow(FlowOfHumidAir outletAirFlow) {
@@ -35,15 +39,26 @@ public record AirCoolingResult(FlowOfHumidAir outletAirFlow,
             return this;
         }
 
+        public Builder coolantSupplyFlow(FlowOfLiquidWater coolantSupplyFlow) {
+            this.coolantSupplyFlow = coolantSupplyFlow;
+            return this;
+        }
+
+        public Builder coolantReturnFlow(FlowOfLiquidWater coolantReturnFlow) {
+            this.coolantReturnFlow = coolantReturnFlow;
+            return this;
+        }
+
         public Builder bypassFactor(BypassFactor bypassFactor) {
             this.bypassFactor = bypassFactor;
             return this;
         }
 
-        public AirCoolingResult build() {
-            return new AirCoolingResult(outletAirFlow, heatOfProcess, condensateFlow, bypassFactor);
+        public AirCoolingNodeResult build() {
+            return new AirCoolingNodeResult(outletAirFlow, heatOfProcess, condensateFlow, coolantSupplyFlow, coolantReturnFlow, bypassFactor);
         }
     }
+
 
     public static Builder builder() {
         return new Builder();

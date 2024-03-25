@@ -89,11 +89,11 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
         String end = "\n\t";
         int digits = 3;
         return "FlowOfLiquidWater:" + end +
-                massFlow.toEngineeringFormat("G_w", digits) + separator +
-                massFlow.toKiloGramPerHour().toEngineeringFormat("G_w", digits) + separator +
-                volFlow.toEngineeringFormat("V_w", digits) + separator +
-                volFlow.toCubicMetersPerHour().toEngineeringFormat("V_w", digits) + end +
-                liquidWater.toConsoleOutput();
+               massFlow.toEngineeringFormat("G_w", digits) + separator +
+               massFlow.toKiloGramPerHour().toEngineeringFormat("G_w", digits) + separator +
+               volFlow.toEngineeringFormat("V_w", digits) + separator +
+               volFlow.toCubicMetersPerHour().toEngineeringFormat("V_w", digits) + end +
+               liquidWater.toConsoleOutput();
     }
 
     @Override
@@ -112,10 +112,10 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
     @Override
     public String toString() {
         return "FlowOfWater{" +
-                "liquidWater=" + liquidWater +
-                ", massFlow=" + massFlow +
-                ", volFlow=" + volFlow +
-                '}';
+               "liquidWater=" + liquidWater +
+               ", massFlow=" + massFlow +
+               ", volFlow=" + volFlow +
+               '}';
     }
 
     // Class factory methods
@@ -146,8 +146,13 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
      * @param liquidWater The new liquid water.
      * @return A new FlowOfLiquidWater object with the specified liquid water.
      */
-    public FlowOfLiquidWater withHumidAir(LiquidWater liquidWater) {
+    public FlowOfLiquidWater withLiquidWater(LiquidWater liquidWater) {
         return FlowOfLiquidWater.of(liquidWater, massFlow);
+    }
+
+    public FlowOfLiquidWater withTemperature(Temperature temperature) {
+        LiquidWater newLiquidWater = LiquidWater.of(temperature);
+        return FlowOfLiquidWater.of(newLiquidWater, massFlow);
     }
 
     // Static factory methods
@@ -176,6 +181,12 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
         Validators.requireNotNull(volFlow);
         MassFlow massFlow = FlowEquations.volFlowToMassFlow(liquidWater.getDensity(), volFlow);
         return new FlowOfLiquidWater(liquidWater, massFlow);
+    }
+
+    public static FlowOfLiquidWater zeroFlow(Temperature temperature) {
+        Validators.requireNotNull(temperature);
+        LiquidWater liquidWater = LiquidWater.of(temperature);
+        return new FlowOfLiquidWater(liquidWater, MassFlow.ofKilogramsPerSecond(0));
     }
 
 }
