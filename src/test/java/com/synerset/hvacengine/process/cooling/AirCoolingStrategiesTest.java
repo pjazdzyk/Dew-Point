@@ -1,5 +1,21 @@
 package com.synerset.hvacengine.process.cooling;
 
+import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.fluids.humidair.HumidAir;
+import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
+import com.synerset.unitility.unitsystem.flow.MassFlow;
+import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
+import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
+import com.synerset.unitility.unitsystem.thermodynamic.Power;
+import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
+import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.withPrecision;
+
 class AirCoolingStrategiesTest {
 /*
     private static final CoolantData COOLANT_DATA = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
