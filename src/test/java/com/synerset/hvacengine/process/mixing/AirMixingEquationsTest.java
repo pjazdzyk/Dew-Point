@@ -3,7 +3,6 @@ package com.synerset.hvacengine.process.mixing;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
-import com.synerset.hvacengine.process.heating.HeatingEquations;
 import com.synerset.hvacengine.process.mixing.dataobject.AirMixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
@@ -16,10 +15,10 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withPrecision;
 
-class AirMixingStrategiesTest {
+class AirMixingEquationsTest {
 
     @Test
-    @DisplayName("should return results for mixing of two different moist air flows")
+    @DisplayName("Mixing equations: should return results for mixing of two different moist air flows")
     void calcMixing_shouldReturnResultsForMixingOfTwoDifferentMoistAirFlows() {
         // Given
         double p_atm = 100_000d;
@@ -62,7 +61,7 @@ class AirMixingStrategiesTest {
     }
 
     @Test
-    @DisplayName("should mix multiple flows together")
+    @DisplayName("Mixing equations: should mix multiple flows together")
     void mixMultipleHumidAirFlows_shouldMixMultipleFlowsTogether() {
         // Given
         FlowOfHumidAir inletFlow = FlowOfHumidAir.ofValues(-20, 99, 1000);

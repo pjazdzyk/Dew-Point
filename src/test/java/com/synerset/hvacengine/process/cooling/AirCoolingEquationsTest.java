@@ -36,7 +36,7 @@ class AirCoolingEquationsTest {
 
     // DRY COOLING
     @Test
-    @DisplayName("should cool down air without humidity ratio change and without condensate discharge when target output temperature is given")
+    @DisplayName("Cooling equations: should cool down air without humidity ratio change and without condensate discharge when target output temperature is given")
     void processOfDryCooling_shouldCoolDownAirWithoutCondensateDischarge_whenTargetOutputTempIsGiven() {
         // Given
         Temperature expectedOutAirTemp = Temperature.ofCelsius(25.0);
@@ -57,7 +57,7 @@ class AirCoolingEquationsTest {
     }
 
     @Test
-    @DisplayName("should cool down air without humidity ratio change and without condensate discharge when target output cooling power is given")
+    @DisplayName("Cooling equations: should cool down air without humidity ratio change and without condensate discharge when target output cooling power is given")
     void processOfDryCooling_shouldCoolDownAirWithoutCondensateDischarge_whenTargetOutputCoolingPowerIsGiven() {
         // Given
         Power expectedHeatOfProcess = Power.ofWatts(-9287.469123327497);
@@ -81,7 +81,7 @@ class AirCoolingEquationsTest {
 
     // REAL COOLING
     @Test
-    @DisplayName("should cool down inlet air when target outlet temperature and average wall temperature of cooling coil is given")
+    @DisplayName("Cooling equations: should cool down inlet air when target outlet temperature and average wall temperature of cooling coil is given")
     void processOfRealCooling_shouldCoolDownInletAir_whenTargetOutletAirTempAndAverageCoilWallTempAreGiven() {
         // Given
         Temperature expectedOutAirTemp = Temperature.ofCelsius(17.0);
@@ -107,7 +107,7 @@ class AirCoolingEquationsTest {
     }
 
     @Test
-    @DisplayName("should cool down inlet air when target relative humidity and average wall temperature of cooling coil is given")
+    @DisplayName("Cooling equations: should cool down inlet air when target relative humidity and average wall temperature of cooling coil is given")
     void processOfRealCooling_shouldCoolDownInletAir_whenTargetOutletRHAndAverageCoilWallTempAreGiven() {
         // Given
         RelativeHumidity expectedRelativeHumidity = RelativeHumidity.ofPercentage(79.82572722353957);
@@ -136,7 +136,7 @@ class AirCoolingEquationsTest {
     }
 
     @Test
-    @DisplayName("should cool down inlet air when input heat and average wall temperature of cooling coil is given")
+    @DisplayName("Cooling equations: should cool down inlet air when input heat and average wall temperature of cooling coil is given")
     void processOfRealCooling_shouldCoolDownInletAir_whenHeatOfProcessIsGiven() {
         // Given
         Power expectedHeatOfProcess = Power.ofWatts(-26835.191594387037);
@@ -163,7 +163,7 @@ class AirCoolingEquationsTest {
 
     // TOOLS
     @Test
-    @DisplayName("should return average cooling coil temperature when coolant supply and return temperatures are given")
+    @DisplayName("Cooling equations: should return average cooling coil temperature when coolant supply and return temperatures are given")
     void averageWallTemp_shouldCalculateAverageCoolingCoilTemperature_whenCoolantInletAndOutletTempsAreGiven() {
         // Given
         Temperature coolantSupplyTemp = Temperature.ofCelsius(6.0);
@@ -178,7 +178,7 @@ class AirCoolingEquationsTest {
     }
 
     @Test
-    @DisplayName("should return by-pass factor when average cooling coil temperature, inlet air temperature and expected outlet temperature are given")
+    @DisplayName("Cooling equations: should return by-pass factor when average cooling coil temperature, inlet air temperature and expected outlet temperature are given")
     void coilBypassFactor_shouldReturnBypassFactor_whenAverageCoilTemperatureInletAirTemperatureAndExpectedOutletTemperatureAreGiven() {
         // Given
         Temperature expectedCoilAverageTemp = Temperature.ofCelsius(9.0);
@@ -194,7 +194,7 @@ class AirCoolingEquationsTest {
     }
 
     @Test
-    @DisplayName("should return condensate mass flow when dry air mass flow, inlet humidity ratio and outlet humidity ratio are given")
+    @DisplayName("Cooling equations: should return condensate mass flow when dry air mass flow, inlet humidity ratio and outlet humidity ratio are given")
     void condensateDischarge_shouldReturnCondensateMassFlow_whenDryAirMassFlowInletHumidityRatioAndOutletHumidityRatioAreGiven() {
         // Given
         MassFlow dryAirMassFlow = MassFlow.ofKilogramsPerSecond(1.5);

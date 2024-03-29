@@ -72,7 +72,15 @@ public class MixingEquations {
 
     public static AirMixingResult mixingOfMultipleFlows(FlowOfHumidAir inletAir, List<FlowOfHumidAir> recirculationAirFlows) {
         Validators.requireNotNull(inletAir);
-        Validators.requireNotEmpty(recirculationAirFlows);
+
+        if (recirculationAirFlows == null || recirculationAirFlows.isEmpty()) {
+            return AirMixingResult.builder()
+                    .inletAirFlow(inletAir)
+                    .outletAirFlow(inletAir)
+                    .recirculationFlows(recirculationAirFlows)
+                    .build();
+        }
+
         MassFlow totalMassFlow = sumOfAllFlows(recirculationAirFlows).plus(inletAir.getMassFlow());
         Validators.requireBelowUpperBoundInclusive(totalMassFlow, FlowOfHumidAir.MASS_FLOW_MAX_LIMIT);
 

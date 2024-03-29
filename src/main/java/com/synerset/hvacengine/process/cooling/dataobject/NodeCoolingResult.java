@@ -2,8 +2,8 @@ package com.synerset.hvacengine.process.cooling.dataobject;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
-import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.ProcessResult;
+import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 

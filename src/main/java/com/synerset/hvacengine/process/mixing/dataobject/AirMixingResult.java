@@ -1,8 +1,8 @@
 package com.synerset.hvacengine.process.mixing.dataobject;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.ProcessResult;
+import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 import java.util.ArrayList;

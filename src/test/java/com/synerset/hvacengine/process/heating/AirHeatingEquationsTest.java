@@ -2,6 +2,7 @@ package com.synerset.hvacengine.process.heating;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AirHeatingEquationsTest {
-/*
+
     private static FlowOfHumidAir inletFlow;
 
     @BeforeAll
@@ -29,17 +30,17 @@ class AirHeatingEquationsTest {
     }
 
     @Test
-    @DisplayName("should heat up an inlet air when positive heat of process is given")
+    @DisplayName("Heating equations: should heat up an inlet air when positive heat of process is given")
     void processOfHeating_shouldHeatUpInletAir_whenHeatOfProcessIsGiven() {
         // Given
         Power inputHeat = Power.ofWatts(56093.07605668045);
         Temperature expectedOutTemp = Temperature.ofCelsius(30d);
 
         // When
-        AirHeatingResult airHeatingResult = HeatingStrategy.of(inletFlow, inputHeat).applyHeating();
+        AirHeatingResult airHeatingResult = HeatingEquations.heatingFromPower(inletFlow, inputHeat);
 
         Power actualProcessHeat = airHeatingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airHeatingResult.outletFlow().getTemperature();
+        Temperature actualOutAirTemp = airHeatingResult.outletAirFlow().getTemperature();
 
         // Then
         assertThat(actualOutAirTemp).isEqualTo(expectedOutTemp);
@@ -47,16 +48,16 @@ class AirHeatingEquationsTest {
     }
 
     @Test
-    @DisplayName("should heat up inlet air when target outlet air temperature is given")
+    @DisplayName("Heating equations: should heat up inlet air when target outlet air temperature is given")
     void processOfHeating_shouldHeatUpInletAir_whenTargetOutletTempIsGiven() {
         // Given
         Temperature targetOutTemp = Temperature.ofCelsius(30d);
         Power inputHeat = Power.ofWatts(56093.07605668045);
 
         // When
-        AirHeatingResult airHeatingResult = HeatingStrategy.of(inletFlow, targetOutTemp).applyHeating();
+        AirHeatingResult airHeatingResult = HeatingEquations.heatingFromTargetTemperature(inletFlow, targetOutTemp);
         Power actualHeatPower = airHeatingResult.heatOfProcess();
-        Temperature actualOutTemp = airHeatingResult.outletFlow().getTemperature();
+        Temperature actualOutTemp = airHeatingResult.outletAirFlow().getTemperature();
 
         // Then
         assertThat(actualHeatPower).isEqualTo(inputHeat);
@@ -64,7 +65,7 @@ class AirHeatingEquationsTest {
     }
 
     @Test
-    @DisplayName("should heat up inlet air when target outlet relative humidity is given")
+    @DisplayName("Heating equations: should heat up inlet air when target outlet relative humidity is given")
     void processOfHeating_shouldHeatUpInletAir_whenTargetRelativeHumidityIsGiven() {
         // Arrange
         RelativeHumidity expectedOutRH = RelativeHumidity.ofPercentage(17.352612275343887);
@@ -72,13 +73,13 @@ class AirHeatingEquationsTest {
         Temperature expectedOutTemp = Temperature.ofCelsius(30d);
 
         // Act
-        AirHeatingResult airHeatingResult = HeatingStrategy.of(inletFlow, expectedOutRH).applyHeating();
+        AirHeatingResult airHeatingResult = HeatingEquations.heatingFromRelativeHumidity(inletFlow, expectedOutRH);
         Power actualHeatOfProcess = airHeatingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airHeatingResult.outletFlow().getTemperature();
+        Temperature actualOutAirTemp = airHeatingResult.outletAirFlow().getTemperature();
 
         // Assert
         assertThat(actualHeatOfProcess.isEqualWithPrecision(expectedHeatOfProcess, 1E-9)).isTrue();
         assertThat(actualOutAirTemp.isEqualWithPrecision(expectedOutTemp, 1E-9)).isTrue();
     }
-*/
+
 }

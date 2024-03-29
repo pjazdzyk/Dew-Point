@@ -65,7 +65,7 @@ public final class Validators {
         if (saturationPressure.isEqualOrGreaterThan(humidAirAbsolutePressure)) {
             throw new HvacEngineArgumentException(
                     String.format("Water vapour saturation pressure exceeds humid air absolute pressure. Calculations are not possible. " +
-                                    " Psat=%s, Pabs=%s, Temp=%s. Increase pressure or change input data.",
+                                  " Psat=%s, Pabs=%s, Temp=%s. Increase pressure or change input data.",
                             saturationPressure, humidAirAbsolutePressure, temperature));
         }
     }
