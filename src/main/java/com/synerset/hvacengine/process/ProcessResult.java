@@ -1,11 +1,11 @@
-package com.synerset.hvacengine.process.computation;
+package com.synerset.hvacengine.process;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 public interface ProcessResult {
+    FlowOfHumidAir inletAirFlow();
     FlowOfHumidAir outletAirFlow();
-    FlowOfLiquidWater condensateFlow();
     Power heatOfProcess();
+    String toConsoleOutput();
 }

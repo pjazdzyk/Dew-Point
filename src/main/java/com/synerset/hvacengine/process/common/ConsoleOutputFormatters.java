@@ -2,13 +2,24 @@ package com.synerset.hvacengine.process.common;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
-import com.synerset.hvacengine.process.cooling.AirCoolingNodeResult;
-import com.synerset.hvacengine.process.cooling.AirCoolingResult;
 import com.synerset.hvacengine.process.cooling.CoolantData;
-import com.synerset.hvacengine.process.heating.AirHeatingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
+import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
+import com.synerset.hvacengine.process.mixing.dataobject.AirMixingResult;
+import com.synerset.unitility.unitsystem.flow.MassFlow;
+import com.synerset.unitility.unitsystem.flow.VolumetricFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
+import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
+
+import java.util.List;
 
 public class ConsoleOutputFormatters {
+
+    private static final String SEPARATOR = " | ";
+    private static final String NEW_LINE = "\n\t";
+    private static final int REL_DIGITS = 3;
 
     private ConsoleOutputFormatters() {
         throw new IllegalStateException("Utility class");
@@ -20,114 +31,144 @@ public class ConsoleOutputFormatters {
      *
      * @return A formatted string representation of the heating process.
      */
-    public static String heatingConsoleOutput(FlowOfHumidAir inletAirFlow, AirHeatingResult airHeatingResult) {
-        String separator = " | ";
-        String end = "\n\t";
-        int digits = 3;
-
-        Power heatOfProcess = airHeatingResult.heatOfProcess();
-        FlowOfHumidAir outletAirFlow = airHeatingResult.outletAirFlow();
-
-
-        return "PROCESS OF HEATING:" + end +
-
-               "INPUT FLOW:" + end +
-               inletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_in", digits) + separator +
-               inletAirFlow.getMassFlow().toEngineeringFormat("G_in", digits) + separator +
-               inletAirFlow.getDryAirMassFlow().toEngineeringFormat("G_in.da", digits) + end +
-
-               inletAirFlow.getTemperature().toEngineeringFormat("DBT_in", digits) + separator +
-               inletAirFlow.getRelativeHumidity().toEngineeringFormat("RH_in", digits) + separator +
-               inletAirFlow.getHumidityRatio().toEngineeringFormat("x_in", digits) + separator +
-               inletAirFlow.getSpecificEnthalpy().toEngineeringFormat("i_in", digits) + end +
-
-               "HEATING POWER:" + end +
-               heatOfProcess.toEngineeringFormat("Q_heat", digits) + separator +
-               heatOfProcess.toKiloWatts().toEngineeringFormat("Q_heat", digits) + end +
-
-               "OUTLET FLOW:" + end +
-               outletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_out", digits) + separator +
-               outletAirFlow.getMassFlow().toEngineeringFormat("G_out", digits) + separator +
-               outletAirFlow.getDryAirMassFlow().toEngineeringFormat("G_out.da", digits) + end +
-
-               outletAirFlow.getTemperature().toEngineeringFormat("DBT_out", digits) + separator +
-               outletAirFlow.getRelativeHumidity().toEngineeringFormat("RH_out", digits) + separator +
-               outletAirFlow.getHumidityRatio().toEngineeringFormat("x_out", digits) + separator +
-               outletAirFlow.getSpecificEnthalpy().toEngineeringFormat("i_out", digits) + end;
+    public static String heatingConsoleOutput(AirHeatingResult airHeatingResult) {
+        return "PROCESS OF HEATING:" + NEW_LINE +
+               inputFlowConsoleOutput(airHeatingResult.inletAirFlow()) + NEW_LINE +
+               heatingPowerConsoleOutput(airHeatingResult.heatOfProcess()) + NEW_LINE +
+               outputFlowConsoleOutput(airHeatingResult.outletAirFlow()) + NEW_LINE;
     }
 
-
     /**
-     * Returns a formatted string representation of the cooling process for console output, including input and output
+     * Returns a formatted string representation of the dry cooling process for console output, including input and output
      * properties.
      *
      * @return A formatted string representation of the cooling process.
      */
-    public static String coolingConsoleOutput(FlowOfHumidAir inletAirFlow, CoolantData coolantData, AirCoolingResult airCoolingResult) {
-        String separator = " | ";
-        String end = "\n\t";
-        int digits = 3;
-        FlowOfHumidAir outletAirFlow = airCoolingResult.outletAirFlow();
-        FlowOfLiquidWater condensateFlow = airCoolingResult.condensateFlow();
-
-        return "PROCESS OF COOLING:" + end +
-
-               "INPUT FLOW:" + end +
-               inletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_in", digits) + separator +
-               inletAirFlow.getMassFlow().toEngineeringFormat("G_in", digits) + separator +
-               inletAirFlow.getDryAirMassFlow().toEngineeringFormat("G_in.da", digits) + end +
-
-               inletAirFlow.getTemperature().toEngineeringFormat("DBT_in", digits) + separator +
-               inletAirFlow.getRelativeHumidity().toEngineeringFormat("RH_in", digits) + separator +
-               inletAirFlow.getHumidityRatio().toEngineeringFormat("x_in", digits) + separator +
-               inletAirFlow.getSpecificEnthalpy().toEngineeringFormat("i", digits) + end +
-
-               "COOLANT DATA:" + end +
-               coolantData.getSupplyTemperature().toEngineeringFormat("t_su", digits) + separator +
-               coolantData.getReturnTemperature().toEngineeringFormat("t_rt", digits) + separator +
-               coolantData.getAverageTemperature().toEngineeringFormat("t_m", digits) + end +
-
-               "COOLING POWER:" + end +
-               airCoolingResult.heatOfProcess().toWatts().toEngineeringFormat("Q_cool", digits) + separator +
-               airCoolingResult.heatOfProcess().toKiloWatts().toEngineeringFormat("Q_cool", digits) + separator +
-               airCoolingResult.bypassFactor().toEngineeringFormat("BF", digits) + end +
-
-               "OUTLET FLOW:" + end +
-               outletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_out", digits) + separator +
-               outletAirFlow.getMassFlow().toEngineeringFormat("G_out", digits) + separator +
-               outletAirFlow.getDryAirMassFlow().toEngineeringFormat("G_out.da", digits) + end +
-
-               outletAirFlow.getTemperature().toEngineeringFormat("DBT_out", digits) + separator +
-               outletAirFlow.getRelativeHumidity().toEngineeringFormat("RH_out", digits) + separator +
-               outletAirFlow.getHumidityRatio().toEngineeringFormat("x_out", digits) + separator +
-               outletAirFlow.getSpecificEnthalpy().toEngineeringFormat("i", digits) + end +
-               "CONDENSATE:" + end +
-               condensateFlow.getMassFlow().toEngineeringFormat("G_cond", digits) + separator +
-               condensateFlow.getTemperature().toEngineeringFormat("t_cond", digits) + separator +
-               condensateFlow.getSpecificEnthalpy().toEngineeringFormat("i_cond", digits) + end;
+    public static String dryCoolingConsoleOutput(DryCoolingResult airCoolingResult) {
+        return "PROCESS OF DRY COOLING:" + NEW_LINE +
+               inputFlowConsoleOutput(airCoolingResult.inletAirFlow()) + NEW_LINE +
+               coolingPowerConsoleOutput(airCoolingResult.heatOfProcess()) + NEW_LINE +
+               outputFlowConsoleOutput(airCoolingResult.outletAirFlow()) + NEW_LINE;
     }
 
-
     /**
-     * Returns a formatted string representation of the cooling process for console output, including input and output
+     * Returns a formatted string representation of the real cooling process for console output, including input and output
      * properties.
      *
      * @return A formatted string representation of the cooling process.
      */
-    public static String coolingConsoleOutput(FlowOfHumidAir inletAirFlow, AirCoolingNodeResult airCoolingNodeResult) {
-        AirCoolingResult result = AirCoolingResult.builder()
-                .heatOfProcess(airCoolingNodeResult.heatOfProcess())
-                .outletAirFlow(airCoolingNodeResult.outletAirFlow())
-                .bypassFactor(airCoolingNodeResult.bypassFactor())
-                .condensateFlow(airCoolingNodeResult.condensateFlow())
-                .build();
+    public static String coolingConsoleOutput(RealCoolingResult airCoolingResult) {
+        return "PROCESS OF REAL COOLING:" + NEW_LINE +
+               inputFlowConsoleOutput(airCoolingResult.inletAirFlow()) + NEW_LINE +
+               "COOLANT DATA:" + NEW_LINE +
+               airCoolingResult.coolantData().getSupplyTemperature().toEngineeringFormat("t_su", REL_DIGITS) + SEPARATOR +
+               airCoolingResult.coolantData().getReturnTemperature().toEngineeringFormat("t_rt", REL_DIGITS) + SEPARATOR +
+               airCoolingResult.coolantData().getAverageTemperature().toEngineeringFormat("t_m", REL_DIGITS) + NEW_LINE +
+               coolingPowerConsoleOutput(airCoolingResult.heatOfProcess()) + SEPARATOR +
+               airCoolingResult.bypassFactor().toEngineeringFormat("BF", REL_DIGITS) + NEW_LINE +
+               outputFlowConsoleOutput(airCoolingResult.outletAirFlow()) + NEW_LINE +
+               condensateFlowConsoleOutput(airCoolingResult.condensateFlow()) + NEW_LINE;
+    }
 
-        CoolantData coolantData = CoolantData.of(
-                airCoolingNodeResult.coolantSupplyFlow().getTemperature(),
-                airCoolingNodeResult.coolantReturnFlow().getTemperature()
-        );
+    /**
+     * Returns a formatted string representation of the real cooling process for console output from node, including input and output
+     * properties.
+     *
+     * @return A formatted string representation of the cooling process.
+     */
+    public static String coolingNodeConsoleOutput(NodeCoolingResult airCoolingResult) {
+        Temperature supplyTemperature = airCoolingResult.coolantSupplyFlow().getTemperature();
+        Temperature returnTemperature = airCoolingResult.coolantReturnFlow().getTemperature();
+        CoolantData coolantData = CoolantData.of(supplyTemperature, returnTemperature);
+        MassFlow coolantMassFlow = airCoolingResult.coolantSupplyFlow().getMassFlow();
+        VolumetricFlow coolantVolFlow = airCoolingResult.coolantSupplyFlow().getVolFlow();
 
-        return coolingConsoleOutput(inletAirFlow, coolantData, result);
+        return "PROCESS OF REAL COOLING:" + NEW_LINE +
+               inputFlowConsoleOutput(airCoolingResult.inletAirFlow()) + NEW_LINE +
+
+               "COOLANT DATA:" + NEW_LINE +
+               coolantData.getSupplyTemperature().toEngineeringFormat("t_su", REL_DIGITS) + SEPARATOR +
+               coolantData.getReturnTemperature().toEngineeringFormat("t_rt", REL_DIGITS) + SEPARATOR +
+               coolantData.getAverageTemperature().toEngineeringFormat("t_m", REL_DIGITS) + NEW_LINE +
+               coolantVolFlow.toCubicMetersPerHour().toEngineeringFormat("V_coolant", REL_DIGITS) + SEPARATOR +
+               coolantMassFlow.toKilogramsPerSecond().toEngineeringFormat("G_coolant", REL_DIGITS) + NEW_LINE +
+
+               coolingPowerConsoleOutput(airCoolingResult.heatOfProcess()) + NEW_LINE +
+               outputFlowConsoleOutput(airCoolingResult.outletAirFlow()) + NEW_LINE +
+               condensateFlowConsoleOutput(airCoolingResult.condensateFlow()) + NEW_LINE;
+    }
+
+    /**
+     * Generates a formatted string representation of the mixing process for console output, including information
+     * about the input flow, recirculation air flows, and the outlet flow.
+     *
+     * @return A formatted string representing the details of the mixing process.
+     */
+    public static String mixingConsoleOutput(AirMixingResult mixingResult) {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<FlowOfHumidAir> recirculationFlows = mixingResult.recirculationFlows().stream().toList();
+        for (int i = 0; i < recirculationFlows.size(); i++) {
+            String flowAsString = mixingConsoleOutput(recirculationFlows.get(i), "RECIRCULATION AIR_" + i + ":", "rec_" + i);
+            stringBuilder.append(flowAsString).append(NEW_LINE);
+        }
+        String recirculationFlowsPart = stringBuilder.toString();
+
+        return "PROCESS OF MIXING:" + NEW_LINE +
+               mixingConsoleOutput(mixingResult.inletAirFlow(), "INPUT FLOW:", "in") + NEW_LINE +
+               recirculationFlowsPart +
+               mixingConsoleOutput(mixingResult.outletAirFlow(), "OUTLET FLOW:", "out") + NEW_LINE;
+    }
+
+    private static String outputFlowConsoleOutput(FlowOfHumidAir outletAirFlow) {
+        return "OUTLET FLOW:" + NEW_LINE +
+               outletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_out", REL_DIGITS) + SEPARATOR +
+               outletAirFlow.getMassFlow().toEngineeringFormat("G_out", REL_DIGITS) + SEPARATOR +
+               outletAirFlow.getDryAirMassFlow().toEngineeringFormat("G_out.da", REL_DIGITS) + NEW_LINE +
+               outletAirFlow.getTemperature().toEngineeringFormat("DBT_out", REL_DIGITS) + SEPARATOR +
+               outletAirFlow.getRelativeHumidity().toEngineeringFormat("RH_out", REL_DIGITS) + SEPARATOR +
+               outletAirFlow.getHumidityRatio().toEngineeringFormat("x_out", REL_DIGITS) + SEPARATOR +
+               outletAirFlow.getSpecificEnthalpy().toEngineeringFormat("i_out", REL_DIGITS);
+    }
+
+    private static String inputFlowConsoleOutput(FlowOfHumidAir inletAirFlow) {
+        return "INPUT FLOW:" + NEW_LINE +
+               inletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_in", REL_DIGITS) + SEPARATOR +
+               inletAirFlow.getMassFlow().toEngineeringFormat("G_in", REL_DIGITS) + SEPARATOR +
+               inletAirFlow.getDryAirMassFlow().toEngineeringFormat("G_in.da", REL_DIGITS) + NEW_LINE +
+               inletAirFlow.getTemperature().toEngineeringFormat("DBT_in", REL_DIGITS) + SEPARATOR +
+               inletAirFlow.getRelativeHumidity().toEngineeringFormat("RH_in", REL_DIGITS) + SEPARATOR +
+               inletAirFlow.getHumidityRatio().toEngineeringFormat("x_in", REL_DIGITS) + SEPARATOR +
+               inletAirFlow.getSpecificEnthalpy().toEngineeringFormat("i_in", REL_DIGITS);
+    }
+
+    private static String coolingPowerConsoleOutput(Power power) {
+        return "COOLING POWER:" + NEW_LINE +
+               power.toWatts().toEngineeringFormat("Q_cool", REL_DIGITS) + SEPARATOR +
+               power.toKiloWatts().toEngineeringFormat("Q_cool", REL_DIGITS);
+    }
+
+    private static String heatingPowerConsoleOutput(Power power) {
+        return "HEATING POWER:" + NEW_LINE +
+               power.toWatts().toEngineeringFormat("Q_heat", REL_DIGITS) + SEPARATOR +
+               power.toKiloWatts().toEngineeringFormat("Q_heat", REL_DIGITS);
+    }
+
+    private static String condensateFlowConsoleOutput(FlowOfLiquidWater condensateFlow) {
+        return "CONDENSATE:" + NEW_LINE +
+               condensateFlow.getMassFlow().toEngineeringFormat("G_cond", REL_DIGITS) + SEPARATOR +
+               condensateFlow.getTemperature().toEngineeringFormat("t_cond", REL_DIGITS) + SEPARATOR +
+               condensateFlow.getSpecificEnthalpy().toEngineeringFormat("i_cond", REL_DIGITS);
+    }
+
+    private static String mixingConsoleOutput(FlowOfHumidAir flowOfAir, String title, String suffix) {
+        return title + NEW_LINE +
+               flowOfAir.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_" + suffix, REL_DIGITS) + SEPARATOR +
+               flowOfAir.getMassFlow().toEngineeringFormat("G_" + suffix, REL_DIGITS) + SEPARATOR +
+               flowOfAir.getDryAirMassFlow().toEngineeringFormat("G_" + suffix + ".da", REL_DIGITS) + NEW_LINE +
+               flowOfAir.getTemperature().toEngineeringFormat("DBT_" + suffix, REL_DIGITS) + SEPARATOR +
+               flowOfAir.getRelativeHumidity().toEngineeringFormat("RH_" + suffix, REL_DIGITS) + SEPARATOR +
+               flowOfAir.getHumidityRatio().toEngineeringFormat("x_" + suffix, REL_DIGITS) + SEPARATOR +
+               flowOfAir.getSpecificEnthalpy().toEngineeringFormat("i_" + suffix, REL_DIGITS);
     }
 
 }

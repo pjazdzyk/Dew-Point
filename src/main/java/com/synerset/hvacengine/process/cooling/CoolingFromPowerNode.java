@@ -8,6 +8,8 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
+import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
@@ -18,7 +20,7 @@ public class CoolingFromPowerNode implements ProcessNode {
     private final InputConnector<CoolantData> coolantDataInputConnector;
     private final OutputConnector<FlowOfLiquidWater> outputCondensateConnector;
     private final InputConnector<Power> heatConnector;
-    private AirCoolingNodeResult coolingResult;
+    private NodeCoolingResult coolingResult;
 
     public CoolingFromPowerNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                 InputConnector<CoolantData> coolantDataConnector,
@@ -43,7 +45,7 @@ public class CoolingFromPowerNode implements ProcessNode {
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
         Power heatingPower = heatConnector.getConnectorData();
         CoolantData coolantData = coolantDataInputConnector.getConnectorData();
-        AirCoolingResult results = CoolingEquations.coolingFromPower(inletAirFlow, coolantData, heatingPower);
+        RealCoolingResult results = CoolingEquations.coolingFromPower(inletAirFlow, coolantData, heatingPower);
 
         outputAirFlowConnector.setConnectorData(results.outletAirFlow());
         outputCondensateConnector.setConnectorData(results.condensateFlow());
@@ -54,8 +56,9 @@ public class CoolingFromPowerNode implements ProcessNode {
                 heatingPower
         );
 
-        this.coolingResult = AirCoolingNodeResult.builder()
+        this.coolingResult = NodeCoolingResult.builder()
                 .heatOfProcess(results.heatOfProcess())
+                .inletAirFlow(inletAirFlow)
                 .bypassFactor(results.bypassFactor())
                 .condensateFlow(results.condensateFlow())
                 .outletAirFlow(results.outletAirFlow())
@@ -65,7 +68,7 @@ public class CoolingFromPowerNode implements ProcessNode {
     }
 
     @Override
-    public AirCoolingNodeResult getProcessResults() {
+    public NodeCoolingResult getProcessResults() {
         return coolingResult;
     }
 
@@ -84,7 +87,7 @@ public class CoolingFromPowerNode implements ProcessNode {
         if (inputAirFlowConnector.getConnectorData() == null || coolingResult == null) {
             return "Results not available. Run process first.";
         }
-        return ConsoleOutputFormatters.coolingConsoleOutput(inputAirFlowConnector.getConnectorData(), coolingResult);
+        return ConsoleOutputFormatters.coolingNodeConsoleOutput(coolingResult);
     }
 
     public InputConnector<Power> getHeatConnector() {

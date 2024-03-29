@@ -8,6 +8,8 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
+import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -20,7 +22,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     private final OutputConnector<FlowOfLiquidWater> outputCondensateConnector;
     private final OutputConnector<Power> heatConnector;
     private final InputConnector<RelativeHumidity> targetRelativeHumidity;
-    private AirCoolingNodeResult coolingResult;
+    private NodeCoolingResult coolingResult;
 
     public CoolingFromHumidityNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                    InputConnector<CoolantData> coolantDataConnector,
@@ -46,7 +48,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
         RelativeHumidity targetRelativeHum = this.targetRelativeHumidity.getConnectorData();
         CoolantData coolantData = coolantDataInputConnector.getConnectorData();
-        AirCoolingResult results = CoolingEquations.coolingFromTargetRelativeHumidity(inletAirFlow, coolantData, targetRelativeHum);
+        RealCoolingResult results = CoolingEquations.coolingFromTargetRelativeHumidity(inletAirFlow, coolantData, targetRelativeHum);
 
         outputAirFlowConnector.setConnectorData(results.outletAirFlow());
         heatConnector.setConnectorData(results.heatOfProcess());
@@ -58,7 +60,8 @@ public class CoolingFromHumidityNode implements ProcessNode {
                 heatConnector.getConnectorData()
         );
 
-        this.coolingResult = AirCoolingNodeResult.builder()
+        this.coolingResult = NodeCoolingResult.builder()
+                .inletAirFlow(inletAirFlow)
                 .heatOfProcess(results.heatOfProcess())
                 .bypassFactor(results.bypassFactor())
                 .condensateFlow(results.condensateFlow())
@@ -69,7 +72,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     }
 
     @Override
-    public AirCoolingNodeResult getProcessResults() {
+    public NodeCoolingResult getProcessResults() {
         return coolingResult;
     }
 
@@ -88,7 +91,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
         if (inputAirFlowConnector.getConnectorData() == null || coolingResult == null) {
             return "Results not available. Run process first.";
         }
-        return ConsoleOutputFormatters.coolingConsoleOutput(inputAirFlowConnector.getConnectorData(), coolingResult);
+        return ConsoleOutputFormatters.coolingNodeConsoleOutput(coolingResult);
     }
 
     public InputConnector<RelativeHumidity> getTargetRelativeHumidity() {

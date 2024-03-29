@@ -2,6 +2,8 @@ package com.synerset.hvacengine.process.cooling;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
@@ -16,8 +18,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withPrecision;
 
-class AirCoolingStrategiesTest {
-/*
+class AirCoolingEquationsTest {
+
     private static final CoolantData COOLANT_DATA = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
     private static FlowOfHumidAir inletFlow;
 
@@ -32,6 +34,51 @@ class AirCoolingStrategiesTest {
         inletFlow = FlowOfHumidAir.ofDryAirMassFlow(inputAir, MassFlow.ofKilogramsPerSecond(1.0));
     }
 
+    // DRY COOLING
+    @Test
+    @DisplayName("should cool down air without humidity ratio change and without condensate discharge when target output temperature is given")
+    void processOfDryCooling_shouldCoolDownAirWithoutCondensateDischarge_whenTargetOutputTempIsGiven() {
+        // Given
+        Temperature expectedOutAirTemp = Temperature.ofCelsius(25.0);
+
+        HumidityRatio expectedOutHumRatio = inletFlow.getHumidityRatio();
+        Power expectedHeatOfProcess = Power.ofWatts(-9287.469123327497);
+
+        // When
+        DryCoolingResult airCoolingResult = CoolingEquations.dryCoolingFromTemperature(inletFlow, expectedOutAirTemp);
+        Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
+        Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
+        HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();
+
+        // Then
+        assertThat(actualHumRatio).isEqualTo(expectedOutHumRatio);
+        assertThat(actualOutAirTemp).isEqualTo(expectedOutAirTemp);
+        assertThat(actualHeatOfProcess).isEqualTo(expectedHeatOfProcess);
+    }
+
+    @Test
+    @DisplayName("should cool down air without humidity ratio change and without condensate discharge when target output cooling power is given")
+    void processOfDryCooling_shouldCoolDownAirWithoutCondensateDischarge_whenTargetOutputCoolingPowerIsGiven() {
+        // Given
+        Power expectedHeatOfProcess = Power.ofWatts(-9287.469123327497);
+
+        Temperature expectedOutAirTemp = Temperature.ofCelsius(25.0);
+        HumidityRatio expectedOutHumRatio = inletFlow.getHumidityRatio();
+        MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0);
+
+        // When
+        DryCoolingResult airCoolingResult = CoolingEquations.dryCoolingFromPower(inletFlow, expectedHeatOfProcess);
+        Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
+        Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
+        HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();
+
+        // Then
+        assertThat(actualHumRatio).isEqualTo(expectedOutHumRatio);
+        assertThat(actualOutAirTemp).isEqualTo(expectedOutAirTemp);
+        assertThat(actualHeatOfProcess).isEqualTo(expectedHeatOfProcess);
+        assertThat(expectedCondensateFlow).isEqualTo(MassFlow.ofKilogramsPerSecond(0));
+    }
+
     // REAL COOLING
     @Test
     @DisplayName("should cool down inlet air when target outlet temperature and average wall temperature of cooling coil is given")
@@ -44,10 +91,10 @@ class AirCoolingStrategiesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
-        AirCoolingResult airCoolingResult = CoolingStrategy.of(inletFlow, COOLANT_DATA, expectedOutAirTemp).applyCooling();
+        RealCoolingResult airCoolingResult = CoolingEquations.coolingFromTargetTemperature(inletFlow, COOLANT_DATA, expectedOutAirTemp);
         Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airCoolingResult.outletFlow().getTemperature();
-        HumidityRatio actualHumRatio = airCoolingResult.outletFlow().getHumidityRatio();
+        Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
+        HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();
         Temperature actualCondensateTemp = airCoolingResult.condensateFlow().getTemperature();
         MassFlow actualCondensateFlow = airCoolingResult.condensateFlow().getMassFlow();
 
@@ -71,11 +118,11 @@ class AirCoolingStrategiesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
-        AirCoolingResult airCoolingResult = CoolingStrategy.of(inletFlow, COOLANT_DATA, expectedRelativeHumidity).applyCooling();
+        RealCoolingResult airCoolingResult = CoolingEquations.coolingFromTargetRelativeHumidity(inletFlow, COOLANT_DATA, expectedRelativeHumidity);
         Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airCoolingResult.outletFlow().getTemperature();
-        RelativeHumidity actualRelativeHumidity = airCoolingResult.outletFlow().getRelativeHumidity();
-        HumidityRatio actualHumRatio = airCoolingResult.outletFlow().getHumidityRatio();
+        Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
+        RelativeHumidity actualRelativeHumidity = airCoolingResult.outletAirFlow().getRelativeHumidity();
+        HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();
         Temperature actualCondensateTemp = airCoolingResult.condensateFlow().getTemperature();
         MassFlow actualCondensateFlow = airCoolingResult.condensateFlow().getMassFlow();
 
@@ -99,10 +146,10 @@ class AirCoolingStrategiesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
-        AirCoolingResult airCoolingResult = CoolingStrategy.of(inletFlow, COOLANT_DATA, expectedHeatOfProcess).applyCooling();
+        RealCoolingResult airCoolingResult = CoolingEquations.coolingFromPower(inletFlow, COOLANT_DATA, expectedHeatOfProcess);
         Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airCoolingResult.outletFlow().getTemperature();
-        HumidityRatio actualHumRatio = airCoolingResult.outletFlow().getHumidityRatio();
+        Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
+        HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();
         Temperature actualCondensateTemp = airCoolingResult.condensateFlow().getTemperature();
         MassFlow actualCondensateFlow = airCoolingResult.condensateFlow().getMassFlow();
 
@@ -140,7 +187,7 @@ class AirCoolingStrategiesTest {
         BypassFactor expectedBypassFactor = BypassFactor.of(0.0952380952380952380952380952381);
 
         // When
-        BypassFactor actualBypassFactor = CoolingHelpers.coilBypassFactor(expectedCoilAverageTemp, inletAirTemperature, expectedOutTemp);
+        BypassFactor actualBypassFactor = CoolingEquations.coilBypassFactor(expectedCoilAverageTemp, inletAirTemperature, expectedOutTemp);
 
         // Then
         assertThat(actualBypassFactor).isEqualTo(expectedBypassFactor);
@@ -156,10 +203,10 @@ class AirCoolingStrategiesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.03015);
 
         // When
-        MassFlow actualCondensateFlow = CoolingHelpers.condensateDischarge(dryAirMassFlow, inletHumidityRatio, outletHumidityRatio);
+        MassFlow actualCondensateFlow = CoolingEquations.condensateDischarge(dryAirMassFlow, inletHumidityRatio, outletHumidityRatio);
 
         // Then
         assertThat(actualCondensateFlow).isEqualTo(expectedCondensateFlow);
     }
-*/
+
 }

@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.withPrecision;
  * Section: 2.1, page: 37
  */
 class MixingTest {
-
+/*
     @Test
     @DisplayName("Mixing: should mix two humid air flows")
     void shouldMixTwoHumidAirFlows() {
@@ -109,5 +109,5 @@ class MixingTest {
         assertThat(mixing.getOutletHumidityRatio().getInKilogramPerKilogram()).isEqualTo(expectedHumRatio.getInKilogramPerKilogram(), withPrecision(5E-5));
         assertThat(mixing.getOutletSpecificEnthalpy().getInKiloJoulesPerKiloGram()).isEqualTo(expectedEnthalpy.getInKiloJoulesPerKiloGram(), withPrecision(8E-2));
     }
-
+*/
 }

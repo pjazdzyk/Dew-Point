@@ -6,6 +6,7 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
+import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
@@ -77,7 +78,7 @@ public class HeatingFromTemperatureNode implements ProcessNode {
         if (inputAirFlowConnector.getConnectorData() == null || heatingResult == null) {
             return "Results not available. Run process first.";
         }
-        return ConsoleOutputFormatters.heatingConsoleOutput(inputAirFlowConnector.getConnectorData(), heatingResult);
+        return ConsoleOutputFormatters.heatingConsoleOutput(heatingResult);
     }
 
     public static HeatingFromTemperatureNode of(FlowOfHumidAir inputAirFlow, Temperature targetTemperature) {

@@ -1,10 +1,11 @@
 package com.synerset.hvacengine.process.heating;
 
 import com.synerset.hvacengine.common.Validators;
-import com.synerset.hvacengine.common.exceptions.HvacEngineArgumentException;
+import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
+import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -26,7 +27,6 @@ public class HeatingEquations {
      * @param inputPower   heating {@link Power}
      */
     public static AirHeatingResult heatingFromPower(FlowOfHumidAir inletAirFlow, Power inputPower) {
-
         Validators.requireNotNull(inletAirFlow);
         Validators.requireNotNull(inputPower);
 
@@ -47,7 +47,11 @@ public class HeatingEquations {
         }
 
         if (inputPower.isEqualZero() || inletAirFlow.getMassFlow().isEqualZero()) {
-            return new AirHeatingResult(inletAirFlow, inputPower, null);
+            return AirHeatingResult.builder()
+                    .inletAirFlow(inletAirFlow)
+                    .outletAirFlow(inletAirFlow)
+                    .heatOfProcess(inputPower)
+                    .build();
         }
 
         HumidAir inletHumidAir = inletAirFlow.getFluid();
@@ -62,7 +66,11 @@ public class HeatingEquations {
         HumidAir outletHumidAir = HumidAir.of(inletAirFlow.getPressure(), Temperature.ofCelsius(tOut), inletAirFlow.getHumidityRatio());
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaIn));
 
-        return new AirHeatingResult(outletFlow, inputPower, null);
+        return AirHeatingResult.builder()
+                .inletAirFlow(inletAirFlow)
+                .outletAirFlow(outletFlow)
+                .heatOfProcess(inputPower)
+                .build();
     }
 
     /**
@@ -74,7 +82,6 @@ public class HeatingEquations {
      * @param targetTemperature target outlet {@link Temperature}
      */
     public static AirHeatingResult heatingFromTargetTemperature(FlowOfHumidAir inletAirFlow, Temperature targetTemperature) {
-
         Validators.requireNotNull(inletAirFlow);
         Validators.requireNotNull(targetTemperature);
         Validators.requireBelowUpperBoundInclusive(targetTemperature, HumidAir.TEMPERATURE_MAX_LIMIT);
@@ -86,7 +93,11 @@ public class HeatingEquations {
         }
 
         if (inletAirFlow.getTemperature().equals(targetTemperature) || inletAirFlow.getMassFlow().isEqualZero()) {
-            return new AirHeatingResult(inletAirFlow, Power.ofWatts(0), null);
+            return AirHeatingResult.builder()
+                    .inletAirFlow(inletAirFlow)
+                    .outletAirFlow(inletAirFlow)
+                    .heatOfProcess(Power.ofWatts(0))
+                    .build();
         }
 
         HumidAir inletHumidAir = inletAirFlow.getFluid();
@@ -110,7 +121,11 @@ public class HeatingEquations {
                 MassFlow.ofKilogramsPerSecond(mdaIn)
         );
 
-        return new AirHeatingResult(outletFlow, requiredHeat, null);
+        return AirHeatingResult.builder()
+                .inletAirFlow(inletAirFlow)
+                .outletAirFlow(outletFlow)
+                .heatOfProcess(requiredHeat)
+                .build();
     }
 
     /**
@@ -121,7 +136,6 @@ public class HeatingEquations {
      * @param targetRelativeHumidity target {@link RelativeHumidity}
      */
     public static AirHeatingResult heatingFromRelativeHumidity(FlowOfHumidAir inletAirFlow, RelativeHumidity targetRelativeHumidity) {
-
         Validators.requireNotNull(inletAirFlow);
         Validators.requireNotNull(targetRelativeHumidity);
         Validators.requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(98));
@@ -132,7 +146,11 @@ public class HeatingEquations {
         }
 
         if (inletAirFlow.getRelativeHumidity().equals(targetRelativeHumidity) || inletAirFlow.getMassFlow().isEqualZero()) {
-            return new AirHeatingResult(inletAirFlow, Power.ofWatts(0), null);
+            return AirHeatingResult.builder()
+                    .inletAirFlow(inletAirFlow)
+                    .outletAirFlow(inletAirFlow)
+                    .heatOfProcess(Power.ofWatts(0))
+                    .build();
         }
 
         HumidAir inletHumidAir = inletAirFlow.getFluid();
@@ -149,7 +167,11 @@ public class HeatingEquations {
         HumidAir outletHumidAir = HumidAir.of(inletAirFlow.getPressure(), Temperature.ofCelsius(tOut), inletAirFlow.getHumidityRatio());
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaIn));
 
-        return new AirHeatingResult(outletFlow, requiredHeat, null);
+        return AirHeatingResult.builder()
+                .inletAirFlow(inletAirFlow)
+                .outletAirFlow(outletFlow)
+                .heatOfProcess(requiredHeat)
+                .build();
     }
 
 }
