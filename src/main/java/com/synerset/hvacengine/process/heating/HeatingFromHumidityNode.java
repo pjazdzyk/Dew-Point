@@ -30,15 +30,16 @@ public class HeatingFromHumidityNode implements ProcessNode {
     }
 
     @Override
-    public void runProcessCalculations() {
+    public AirHeatingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         targetRelativeHumidityConnector.updateConnectorData();
         RelativeHumidity targetRelativeHumidity = targetRelativeHumidityConnector.getConnectorData();
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
-        AirHeatingResult results = HeatingEquations.heatingFromRelativeHumidity(inletAirFlow, targetRelativeHumidity);
-        outputAirFlowConnector.setConnectorData(results.outletAirFlow());
-        outputHeatConnector.setConnectorData(results.heatOfProcess());
-        this.heatingResult = results;
+        AirHeatingResult heatingProcessResults = HeatingEquations.heatingFromRelativeHumidity(inletAirFlow, targetRelativeHumidity);
+        outputAirFlowConnector.setConnectorData(heatingProcessResults.outletAirFlow());
+        outputHeatConnector.setConnectorData(heatingProcessResults.heatOfProcess());
+        this.heatingResult = heatingProcessResults;
+        return heatingProcessResults;
     }
 
     @Override

@@ -51,8 +51,7 @@ class MixingNodesTest {
 
         // When
         MixingNode mixingNode = MixingNode.of(inletFlow, recirculationFlow);
-        mixingNode.runProcessCalculations();
-        AirMixingResult processResults = mixingNode.getProcessResults();
+        AirMixingResult processResults = mixingNode.runProcessCalculations();
         List<FlowOfHumidAir> actualMixingFlows = mixingNode.getMixingFlows();
 
         // Then
@@ -114,8 +113,7 @@ class MixingNodesTest {
 
         // When
         MixingNode mixingNode = MixingNode.of(inletFlow, List.of(recirculationFlow1, recirculationFlow2));
-        mixingNode.runProcessCalculations();
-        AirMixingResult processResults = mixingNode.getProcessResults();
+        AirMixingResult processResults = mixingNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -138,5 +136,4 @@ class MixingNodesTest {
         assertThat(mixingNode.getMixingFlows()).hasSize(3);
         assertThat(processResultsNewFlow.outletAirFlow().getMassFlow()).isEqualTo(sumOfAllFlows.plus(outletAirFlow.getMassFlow()));
     }
-
 }

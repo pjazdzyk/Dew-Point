@@ -46,8 +46,7 @@ class CoolingNodesTest {
 
         // When
         CoolingFromTemperatureNode coolingNode = CoolingFromTemperatureNode.of(TEST_INLET_AIR_FLOW, coolantData, targetTemperature);
-        coolingNode.runProcessCalculations();
-        NodeCoolingResult processResults = coolingNode.getProcessResults();
+        NodeCoolingResult processResults = coolingNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -87,8 +86,7 @@ class CoolingNodesTest {
 
         // When
         CoolingFromPowerNode coolingFromPowerNode = CoolingFromPowerNode.of(TEST_INLET_AIR_FLOW, coolantData, inputPower);
-        coolingFromPowerNode.runProcessCalculations();
-        NodeCoolingResult processResults = coolingFromPowerNode.getProcessResults();
+        NodeCoolingResult processResults = coolingFromPowerNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -126,8 +124,7 @@ class CoolingNodesTest {
 
         // When
         CoolingFromHumidityNode coolingFromHumidityNode = CoolingFromHumidityNode.of(TEST_INLET_AIR_FLOW, coolantData, targetRH);
-        coolingFromHumidityNode.runProcessCalculations();
-        NodeCoolingResult processResults = coolingFromHumidityNode.getProcessResults();
+        NodeCoolingResult processResults = coolingFromHumidityNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();

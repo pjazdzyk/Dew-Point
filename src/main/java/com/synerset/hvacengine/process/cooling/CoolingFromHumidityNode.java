@@ -40,7 +40,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     }
 
     @Override
-    public void runProcessCalculations() {
+    public NodeCoolingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         coolantDataInputConnector.updateConnectorData();
         targetRelativeHumidity.updateConnectorData();
@@ -60,7 +60,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
                 heatConnector.getConnectorData()
         );
 
-        this.coolingResult = NodeCoolingResult.builder()
+        NodeCoolingResult coolingProcessResult = NodeCoolingResult.builder()
                 .inletAirFlow(inletAirFlow)
                 .heatOfProcess(results.heatOfProcess())
                 .bypassFactor(results.bypassFactor())
@@ -69,6 +69,9 @@ public class CoolingFromHumidityNode implements ProcessNode {
                 .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(coolantData.getSupplyTemperature()), coolantMassFlow))
                 .coolantReturnFlow(FlowOfLiquidWater.of(LiquidWater.of(coolantData.getReturnTemperature()), coolantMassFlow))
                 .build();
+
+        this.coolingResult = coolingProcessResult;
+        return coolingProcessResult;
     }
 
     @Override

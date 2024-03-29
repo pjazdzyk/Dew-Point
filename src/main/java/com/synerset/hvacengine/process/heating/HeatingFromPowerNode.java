@@ -25,14 +25,15 @@ public class HeatingFromPowerNode implements ProcessNode {
     }
 
     @Override
-    public void runProcessCalculations() {
+    public AirHeatingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         inputHeatConnector.updateConnectorData();
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
         Power heatingPower = inputHeatConnector.getConnectorData();
-        AirHeatingResult results = HeatingEquations.heatingFromPower(inletAirFlow, heatingPower);
-        outputAirFlowConnector.setConnectorData(results.outletAirFlow());
-        this.heatingResult = results;
+        AirHeatingResult heatingProcessResults = HeatingEquations.heatingFromPower(inletAirFlow, heatingPower);
+        outputAirFlowConnector.setConnectorData(heatingProcessResults.outletAirFlow());
+        this.heatingResult = heatingProcessResults;
+        return heatingProcessResults;
     }
 
     @Override

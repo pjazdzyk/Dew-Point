@@ -41,8 +41,7 @@ class HeatingNodesTest {
 
         // When
         HeatingFromPowerNode heatingFromPowerNode = HeatingFromPowerNode.of(TEST_INLET_FLOW, inputPower);
-        heatingFromPowerNode.runProcessCalculations();
-        AirHeatingResult processResults = heatingFromPowerNode.getProcessResults();
+        AirHeatingResult processResults = heatingFromPowerNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -69,8 +68,7 @@ class HeatingNodesTest {
 
         // When
         HeatingFromTemperatureNode heatingFromTemperatureNode = HeatingFromTemperatureNode.of(TEST_INLET_FLOW, targetTemperature);
-        heatingFromTemperatureNode.runProcessCalculations();
-        AirHeatingResult processResults = heatingFromTemperatureNode.getProcessResults();
+        AirHeatingResult processResults = heatingFromTemperatureNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -98,8 +96,7 @@ class HeatingNodesTest {
 
         // When
         HeatingFromHumidityNode heatingFromHumidityNode = HeatingFromHumidityNode.of(TEST_INLET_FLOW, targetRH);
-        heatingFromHumidityNode.runProcessCalculations();
-        AirHeatingResult processResults = heatingFromHumidityNode.getProcessResults();
+        AirHeatingResult processResults = heatingFromHumidityNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();

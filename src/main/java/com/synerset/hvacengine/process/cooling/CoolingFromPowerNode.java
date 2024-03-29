@@ -37,7 +37,7 @@ public class CoolingFromPowerNode implements ProcessNode {
     }
 
     @Override
-    public void runProcessCalculations() {
+    public NodeCoolingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         coolantDataInputConnector.updateConnectorData();
         heatConnector.updateConnectorData();
@@ -56,7 +56,7 @@ public class CoolingFromPowerNode implements ProcessNode {
                 heatingPower
         );
 
-        this.coolingResult = NodeCoolingResult.builder()
+        NodeCoolingResult coolingProcessResult = NodeCoolingResult.builder()
                 .heatOfProcess(results.heatOfProcess())
                 .inletAirFlow(inletAirFlow)
                 .bypassFactor(results.bypassFactor())
@@ -65,6 +65,9 @@ public class CoolingFromPowerNode implements ProcessNode {
                 .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(coolantData.getSupplyTemperature()), coolantMassFlow))
                 .coolantReturnFlow(FlowOfLiquidWater.of(LiquidWater.of(coolantData.getReturnTemperature()), coolantMassFlow))
                 .build();
+
+        this.coolingResult = coolingProcessResult;
+        return coolingProcessResult;
     }
 
     @Override

@@ -30,15 +30,16 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     }
 
     @Override
-    public void runProcessCalculations() {
+    public AirHeatingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         targetTemperatureConnector.updateConnectorData();
         Temperature targetTemperature = targetTemperatureConnector.getConnectorData();
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
-        AirHeatingResult results = HeatingEquations.heatingFromTargetTemperature(inletAirFlow, targetTemperature);
-        outputAirFlowConnector.setConnectorData(results.outletAirFlow());
-        outputHeatConnector.setConnectorData(results.heatOfProcess());
-        this.heatingResult = results;
+        AirHeatingResult heatingProcessResults = HeatingEquations.heatingFromTargetTemperature(inletAirFlow, targetTemperature);
+        outputAirFlowConnector.setConnectorData(heatingProcessResults.outletAirFlow());
+        outputHeatConnector.setConnectorData(heatingProcessResults.heatOfProcess());
+        this.heatingResult = heatingProcessResults;
+        return heatingProcessResults;
     }
 
     @Override

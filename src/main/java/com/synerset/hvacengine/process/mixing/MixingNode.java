@@ -39,7 +39,7 @@ public class MixingNode implements ProcessNode {
     }
 
     @Override
-    public void runProcessCalculations() {
+    public AirMixingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         mixingFlowConnectors.forEach(InputConnector::updateConnectorData);
         List<FlowOfHumidAir> recirculationFlows = mixingFlowConnectors.stream()
@@ -47,11 +47,12 @@ public class MixingNode implements ProcessNode {
                 .toList();
 
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
-        AirMixingResult results = MixingEquations.mixingOfMultipleFlows(inletAirFlow, recirculationFlows);
+        AirMixingResult mixingProcessResults = MixingEquations.mixingOfMultipleFlows(inletAirFlow, recirculationFlows);
 
-        outputAirFlowConnector.setConnectorData(results.outletAirFlow());
+        outputAirFlowConnector.setConnectorData(mixingProcessResults.outletAirFlow());
+        this.mixingResult = mixingProcessResults;
 
-        this.mixingResult = results;
+        return mixingProcessResults;
     }
 
     @Override
