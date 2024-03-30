@@ -10,7 +10,7 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
 /**
  * Represents the result of an air cooling process.
  */
-public record NodeCoolingResult(FlowOfHumidAir inletAirFlow,
+public record CoolingNodeResult(FlowOfHumidAir inletAirFlow,
                                 FlowOfHumidAir outletAirFlow,
                                 Power heatOfProcess,
                                 FlowOfLiquidWater condensateFlow,
@@ -67,8 +67,8 @@ public record NodeCoolingResult(FlowOfHumidAir inletAirFlow,
             return this;
         }
 
-        public NodeCoolingResult build() {
-            return new NodeCoolingResult(inletAirFlow, outletAirFlow, heatOfProcess, condensateFlow,
+        public CoolingNodeResult build() {
+            return new CoolingNodeResult(inletAirFlow, outletAirFlow, heatOfProcess, condensateFlow,
                     coolantSupplyFlow, coolantReturnFlow, bypassFactor);
         }
     }

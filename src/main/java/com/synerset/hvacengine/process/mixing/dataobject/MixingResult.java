@@ -6,15 +6,15 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * The AirMixingResult record represents the result of a mixing process.
  */
-public record AirMixingResult(FlowOfHumidAir inletAirFlow,
-                              FlowOfHumidAir outletAirFlow,
-                              Power heatOfProcess,
-                              List<FlowOfHumidAir> recirculationFlows) implements ProcessResult {
+public record MixingResult(FlowOfHumidAir inletAirFlow,
+                           FlowOfHumidAir outletAirFlow,
+                           Power heatOfProcess,
+                           Collection<FlowOfHumidAir> recirculationFlows) implements ProcessResult {
 
     @Override
     public String toConsoleOutput() {
@@ -25,7 +25,7 @@ public record AirMixingResult(FlowOfHumidAir inletAirFlow,
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess = Power.ofWatts(0);
-        private List<FlowOfHumidAir> recirculationFlows;
+        private Collection<FlowOfHumidAir> recirculationFlows;
 
         public AirMixingResultBuilder() {
             recirculationFlows = new ArrayList<>();
@@ -46,13 +46,13 @@ public record AirMixingResult(FlowOfHumidAir inletAirFlow,
             return this;
         }
 
-        public AirMixingResultBuilder recirculationFlows(List<FlowOfHumidAir> recirculationFlows) {
+        public AirMixingResultBuilder recirculationFlows(Collection<FlowOfHumidAir> recirculationFlows) {
             this.recirculationFlows = recirculationFlows;
             return this;
         }
 
-        public AirMixingResult build() {
-            return new AirMixingResult(inletAirFlow, outletAirFlow, heatOfProcess, recirculationFlows);
+        public MixingResult build() {
+            return new MixingResult(inletAirFlow, outletAirFlow, heatOfProcess, recirculationFlows);
         }
 
     }

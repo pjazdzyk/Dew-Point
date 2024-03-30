@@ -3,7 +3,7 @@ package com.synerset.hvacengine.process.heating;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
-import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
+import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -41,7 +41,7 @@ class HeatingNodesTest {
 
         // When
         HeatingFromPowerNode heatingFromPowerNode = HeatingFromPowerNode.of(TEST_INLET_FLOW, inputPower);
-        AirHeatingResult processResults = heatingFromPowerNode.runProcessCalculations();
+        HeatingResult processResults = heatingFromPowerNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -68,7 +68,7 @@ class HeatingNodesTest {
 
         // When
         HeatingFromTemperatureNode heatingFromTemperatureNode = HeatingFromTemperatureNode.of(TEST_INLET_FLOW, targetTemperature);
-        AirHeatingResult processResults = heatingFromTemperatureNode.runProcessCalculations();
+        HeatingResult processResults = heatingFromTemperatureNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -96,7 +96,7 @@ class HeatingNodesTest {
 
         // When
         HeatingFromHumidityNode heatingFromHumidityNode = HeatingFromHumidityNode.of(TEST_INLET_FLOW, targetRH);
-        AirHeatingResult processResults = heatingFromHumidityNode.runProcessCalculations();
+        HeatingResult processResults = heatingFromHumidityNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();

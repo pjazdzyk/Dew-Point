@@ -1,15 +1,17 @@
 package com.synerset.hvacengine.process.computation;
 
+import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ProcessResult;
 
 import java.util.*;
 
-public class SequentialProcessor {
+public class SequentialProcessingEngine {
 
     private final List<ProcessNode> nodes;
     private final List<ProcessResult> results;
+    private FlowOfHumidAir inletAirFlow;
 
-    public SequentialProcessor() {
+    public SequentialProcessingEngine() {
         this.results = new ArrayList<>();
         this.nodes = new ArrayList<>();
     }
@@ -26,11 +28,15 @@ public class SequentialProcessor {
         return nodes.size() - 1;
     }
 
-    public void runAll() {
+    public ProcessResult runCalculationsForAllNodes() {
+        if(inletAirFlow != null && !nodes.isEmpty()){
+            nodes.get(0).getAirFlowInputConnector().setConnectorData(inletAirFlow);
+        }
         nodes.forEach(node -> {
             node.runProcessCalculations();
             results.add(node.getProcessResults());
         });
+        return getLastResult();
     }
 
     public ProcessResult getLastResult() {
@@ -43,6 +49,10 @@ public class SequentialProcessor {
 
     public List<ProcessNode> getAllProcessNodes() {
         return Collections.unmodifiableList(nodes);
+    }
+
+    public void setInletAirFlow(FlowOfHumidAir inletAirFlow) {
+        this.inletAirFlow = inletAirFlow;
     }
 
     public String toConsoleOutputLastResult() {
@@ -64,14 +74,20 @@ public class SequentialProcessor {
         return Optional.of(results.get(results.size() - 1));
     }
 
-    public static SequentialProcessor createEmpty() {
-        return new SequentialProcessor();
+    public static SequentialProcessingEngine createEmpty() {
+        return new SequentialProcessingEngine();
     }
 
-    public static SequentialProcessor of(ProcessNode... processNodes) {
-        SequentialProcessor sequentialProcessor = new SequentialProcessor();
-        Arrays.stream(processNodes).forEach(sequentialProcessor::addProcessNode);
-        return sequentialProcessor;
+    public static SequentialProcessingEngine of(FlowOfHumidAir inletAirFLow){
+        SequentialProcessingEngine sequentialProcessingEngine = new SequentialProcessingEngine();
+        sequentialProcessingEngine.setInletAirFlow(inletAirFLow);
+        return sequentialProcessingEngine;
+    }
+
+    public static SequentialProcessingEngine of(ProcessNode... processNodes) {
+        SequentialProcessingEngine sequentialProcessingEngine = new SequentialProcessingEngine();
+        Arrays.stream(processNodes).forEach(sequentialProcessingEngine::addProcessNode);
+        return sequentialProcessingEngine;
     }
 
 }

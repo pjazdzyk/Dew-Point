@@ -8,7 +8,7 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
-import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -22,7 +22,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
     private final OutputConnector<FlowOfLiquidWater> outputCondensateConnector;
     private final OutputConnector<Power> heatConnector;
     private final InputConnector<Temperature> targetTemperatureConnector;
-    private NodeCoolingResult coolingResult;
+    private CoolingNodeResult coolingResult;
 
     public CoolingFromTemperatureNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                       InputConnector<CoolantData> coolantDataConnector,
@@ -40,7 +40,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
     }
 
     @Override
-    public NodeCoolingResult runProcessCalculations() {
+    public CoolingNodeResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         coolantDataInputConnector.updateConnectorData();
         targetTemperatureConnector.updateConnectorData();
@@ -60,7 +60,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
                 heatConnector.getConnectorData()
         );
 
-        NodeCoolingResult coolingProcessResult = NodeCoolingResult.builder()
+        CoolingNodeResult coolingProcessResult = CoolingNodeResult.builder()
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(results.outletAirFlow())
                 .heatOfProcess(results.heatOfProcess())
@@ -75,7 +75,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
     }
 
     @Override
-    public NodeCoolingResult getProcessResults() {
+    public CoolingNodeResult getProcessResults() {
         return coolingResult;
     }
 

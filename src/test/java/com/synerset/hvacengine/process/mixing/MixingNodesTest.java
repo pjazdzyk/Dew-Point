@@ -2,7 +2,7 @@ package com.synerset.hvacengine.process.mixing;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
-import com.synerset.hvacengine.process.mixing.dataobject.AirMixingResult;
+import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -51,7 +51,7 @@ class MixingNodesTest {
 
         // When
         MixingNode mixingNode = MixingNode.of(inletFlow, recirculationFlow);
-        AirMixingResult processResults = mixingNode.runProcessCalculations();
+        MixingResult processResults = mixingNode.runProcessCalculations();
         List<FlowOfHumidAir> actualMixingFlows = mixingNode.getMixingFlows();
 
         // Then
@@ -71,7 +71,7 @@ class MixingNodesTest {
         // Resetting mixing flows, expecting outlet air = inlet air
         mixingNode.resetMixingFlows();
         mixingNode.runProcessCalculations();
-        AirMixingResult processResultsNoMixing = mixingNode.getProcessResults();
+        MixingResult processResultsNoMixing = mixingNode.getProcessResults();
         assertThat(processResultsNoMixing.inletAirFlow()).isEqualTo(processResultsNoMixing.outletAirFlow());
     }
 
@@ -113,7 +113,7 @@ class MixingNodesTest {
 
         // When
         MixingNode mixingNode = MixingNode.of(inletFlow, List.of(recirculationFlow1, recirculationFlow2));
-        AirMixingResult processResults = mixingNode.runProcessCalculations();
+        MixingResult processResults = mixingNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -131,7 +131,7 @@ class MixingNodesTest {
         // Adding another flow
         mixingNode.addMixingFlow(outletAirFlow);
         mixingNode.runProcessCalculations();
-        AirMixingResult processResultsNewFlow = mixingNode.getProcessResults();
+        MixingResult processResultsNewFlow = mixingNode.getProcessResults();
 
         assertThat(mixingNode.getMixingFlows()).hasSize(3);
         assertThat(processResultsNewFlow.outletAirFlow().getMassFlow()).isEqualTo(sumOfAllFlows.plus(outletAirFlow.getMassFlow()));

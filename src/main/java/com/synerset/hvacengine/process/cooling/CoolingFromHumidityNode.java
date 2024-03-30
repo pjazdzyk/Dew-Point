@@ -8,7 +8,7 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
-import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -22,7 +22,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     private final OutputConnector<FlowOfLiquidWater> outputCondensateConnector;
     private final OutputConnector<Power> heatConnector;
     private final InputConnector<RelativeHumidity> targetRelativeHumidity;
-    private NodeCoolingResult coolingResult;
+    private CoolingNodeResult coolingResult;
 
     public CoolingFromHumidityNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                    InputConnector<CoolantData> coolantDataConnector,
@@ -40,7 +40,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     }
 
     @Override
-    public NodeCoolingResult runProcessCalculations() {
+    public CoolingNodeResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         coolantDataInputConnector.updateConnectorData();
         targetRelativeHumidity.updateConnectorData();
@@ -60,7 +60,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
                 heatConnector.getConnectorData()
         );
 
-        NodeCoolingResult coolingProcessResult = NodeCoolingResult.builder()
+        CoolingNodeResult coolingProcessResult = CoolingNodeResult.builder()
                 .inletAirFlow(inletAirFlow)
                 .heatOfProcess(results.heatOfProcess())
                 .bypassFactor(results.bypassFactor())
@@ -75,7 +75,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     }
 
     @Override
-    public NodeCoolingResult getProcessResults() {
+    public CoolingNodeResult getProcessResults() {
         return coolingResult;
     }
 

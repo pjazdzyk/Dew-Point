@@ -5,7 +5,7 @@ import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWaterEquations;
-import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -46,7 +46,7 @@ class CoolingNodesTest {
 
         // When
         CoolingFromTemperatureNode coolingNode = CoolingFromTemperatureNode.of(TEST_INLET_AIR_FLOW, coolantData, targetTemperature);
-        NodeCoolingResult processResults = coolingNode.runProcessCalculations();
+        CoolingNodeResult processResults = coolingNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -86,7 +86,7 @@ class CoolingNodesTest {
 
         // When
         CoolingFromPowerNode coolingFromPowerNode = CoolingFromPowerNode.of(TEST_INLET_AIR_FLOW, coolantData, inputPower);
-        NodeCoolingResult processResults = coolingFromPowerNode.runProcessCalculations();
+        CoolingNodeResult processResults = coolingFromPowerNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -124,7 +124,7 @@ class CoolingNodesTest {
 
         // When
         CoolingFromHumidityNode coolingFromHumidityNode = CoolingFromHumidityNode.of(TEST_INLET_AIR_FLOW, coolantData, targetRH);
-        NodeCoolingResult processResults = coolingFromHumidityNode.runProcessCalculations();
+        CoolingNodeResult processResults = coolingFromHumidityNode.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();

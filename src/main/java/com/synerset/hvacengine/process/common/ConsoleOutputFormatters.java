@@ -3,11 +3,11 @@ package com.synerset.hvacengine.process.common;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.process.cooling.CoolantData;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
-import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
-import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
-import com.synerset.hvacengine.process.mixing.dataobject.AirMixingResult;
+import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
+import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.flow.VolumetricFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -31,11 +31,11 @@ public class ConsoleOutputFormatters {
      *
      * @return A formatted string representation of the heating process.
      */
-    public static String heatingConsoleOutput(AirHeatingResult airHeatingResult) {
+    public static String heatingConsoleOutput(HeatingResult heatingResult) {
         return "PROCESS OF HEATING:" + NEW_LINE +
-               inputFlowConsoleOutput(airHeatingResult.inletAirFlow()) + NEW_LINE +
-               heatingPowerConsoleOutput(airHeatingResult.heatOfProcess()) + NEW_LINE +
-               outputFlowConsoleOutput(airHeatingResult.outletAirFlow()) + NEW_LINE;
+               inputFlowConsoleOutput(heatingResult.inletAirFlow()) + NEW_LINE +
+               heatingPowerConsoleOutput(heatingResult.heatOfProcess()) + NEW_LINE +
+               outputFlowConsoleOutput(heatingResult.outletAirFlow()) + NEW_LINE;
     }
 
     /**
@@ -76,7 +76,7 @@ public class ConsoleOutputFormatters {
      *
      * @return A formatted string representation of the cooling process.
      */
-    public static String coolingNodeConsoleOutput(NodeCoolingResult airCoolingResult) {
+    public static String coolingNodeConsoleOutput(CoolingNodeResult airCoolingResult) {
         Temperature supplyTemperature = airCoolingResult.coolantSupplyFlow().getTemperature();
         Temperature returnTemperature = airCoolingResult.coolantReturnFlow().getTemperature();
         CoolantData coolantData = CoolantData.of(supplyTemperature, returnTemperature);
@@ -104,7 +104,7 @@ public class ConsoleOutputFormatters {
      *
      * @return A formatted string representing the details of the mixing process.
      */
-    public static String mixingConsoleOutput(AirMixingResult mixingResult) {
+    public static String mixingConsoleOutput(MixingResult mixingResult) {
         StringBuilder stringBuilder = new StringBuilder();
         List<FlowOfHumidAir> recirculationFlows = mixingResult.recirculationFlows().stream().toList();
         for (int i = 0; i < recirculationFlows.size(); i++) {

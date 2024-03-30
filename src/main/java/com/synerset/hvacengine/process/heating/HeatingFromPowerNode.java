@@ -6,7 +6,7 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
-import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
+import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 public class HeatingFromPowerNode implements ProcessNode {
@@ -14,7 +14,7 @@ public class HeatingFromPowerNode implements ProcessNode {
     private final InputConnector<FlowOfHumidAir> inputAirFlowConnector;
     private final InputConnector<Power> inputHeatConnector;
     private final OutputConnector<FlowOfHumidAir> outputAirFlowConnector;
-    private AirHeatingResult heatingResult;
+    private HeatingResult heatingResult;
 
     public HeatingFromPowerNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector, InputConnector<Power> inputHeatConnector) {
         Validators.requireNotNull(inputAirFlowConnector);
@@ -25,19 +25,19 @@ public class HeatingFromPowerNode implements ProcessNode {
     }
 
     @Override
-    public AirHeatingResult runProcessCalculations() {
+    public HeatingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         inputHeatConnector.updateConnectorData();
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
         Power heatingPower = inputHeatConnector.getConnectorData();
-        AirHeatingResult heatingProcessResults = HeatingEquations.heatingFromPower(inletAirFlow, heatingPower);
+        HeatingResult heatingProcessResults = HeatingEquations.heatingFromPower(inletAirFlow, heatingPower);
         outputAirFlowConnector.setConnectorData(heatingProcessResults.outletAirFlow());
         this.heatingResult = heatingProcessResults;
         return heatingProcessResults;
     }
 
     @Override
-    public AirHeatingResult getProcessResults() {
+    public HeatingResult getProcessResults() {
         return heatingResult;
     }
 

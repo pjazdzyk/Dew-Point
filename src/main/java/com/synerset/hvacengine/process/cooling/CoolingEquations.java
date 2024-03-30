@@ -10,8 +10,8 @@ import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWaterEquations;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
-import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
@@ -114,7 +114,7 @@ public class CoolingEquations {
 
     /**
      * Real cooling coil process result as a double array, for provided cooling power.
-     * Results structure: {@link NodeCoolingResult}
+     * Results structure: {@link CoolingNodeResult}
      * REFERENCE SOURCE: [1] [Q, W] (-) [37]
      *
      * @param inletAirFlow     initial {@link FlowOfHumidAir}
@@ -174,7 +174,7 @@ public class CoolingEquations {
      * Real cooling coil process. Returns real cooling coil process result as double array, to achieve expected outlet
      * temperature. This method represents real cooling coil, where additional energy is used to discharge more condensate
      * compared to ideal coil.
-     * Results structure: {@link NodeCoolingResult}
+     * Results structure: {@link CoolingNodeResult}
      * REFERENCE SOURCE: [1] [t2,oC] (-) [37]
      *
      * @param inletAirFlow      initial {@link FlowOfHumidAir}

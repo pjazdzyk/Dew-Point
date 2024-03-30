@@ -8,9 +8,9 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
 /**
  * Represents the result of an air heating process.
  */
-public record AirHeatingResult(FlowOfHumidAir inletAirFlow,
-                               FlowOfHumidAir outletAirFlow,
-                               Power heatOfProcess) implements ProcessResult {
+public record HeatingResult(FlowOfHumidAir inletAirFlow,
+                            FlowOfHumidAir outletAirFlow,
+                            Power heatOfProcess) implements ProcessResult {
     @Override
     public String toConsoleOutput() {
         return ConsoleOutputFormatters.heatingConsoleOutput(this);
@@ -36,8 +36,8 @@ public record AirHeatingResult(FlowOfHumidAir inletAirFlow,
             return this;
         }
 
-        public AirHeatingResult build() {
-            return new AirHeatingResult(inletAirFlow, outletAirFlow, heatOfProcess);
+        public HeatingResult build() {
+            return new HeatingResult(inletAirFlow, outletAirFlow, heatOfProcess);
         }
     }
 

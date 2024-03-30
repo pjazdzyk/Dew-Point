@@ -2,7 +2,7 @@ package com.synerset.hvacengine.process.heating;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
-import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
+import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -37,10 +37,10 @@ class AirHeatingEquationsTest {
         Temperature expectedOutTemp = Temperature.ofCelsius(30d);
 
         // When
-        AirHeatingResult airHeatingResult = HeatingEquations.heatingFromPower(inletFlow, inputHeat);
+        HeatingResult heatingResult = HeatingEquations.heatingFromPower(inletFlow, inputHeat);
 
-        Power actualProcessHeat = airHeatingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airHeatingResult.outletAirFlow().getTemperature();
+        Power actualProcessHeat = heatingResult.heatOfProcess();
+        Temperature actualOutAirTemp = heatingResult.outletAirFlow().getTemperature();
 
         // Then
         assertThat(actualOutAirTemp).isEqualTo(expectedOutTemp);
@@ -55,9 +55,9 @@ class AirHeatingEquationsTest {
         Power inputHeat = Power.ofWatts(56093.07605668045);
 
         // When
-        AirHeatingResult airHeatingResult = HeatingEquations.heatingFromTargetTemperature(inletFlow, targetOutTemp);
-        Power actualHeatPower = airHeatingResult.heatOfProcess();
-        Temperature actualOutTemp = airHeatingResult.outletAirFlow().getTemperature();
+        HeatingResult heatingResult = HeatingEquations.heatingFromTargetTemperature(inletFlow, targetOutTemp);
+        Power actualHeatPower = heatingResult.heatOfProcess();
+        Temperature actualOutTemp = heatingResult.outletAirFlow().getTemperature();
 
         // Then
         assertThat(actualHeatPower).isEqualTo(inputHeat);
@@ -73,9 +73,9 @@ class AirHeatingEquationsTest {
         Temperature expectedOutTemp = Temperature.ofCelsius(30d);
 
         // Act
-        AirHeatingResult airHeatingResult = HeatingEquations.heatingFromRelativeHumidity(inletFlow, expectedOutRH);
-        Power actualHeatOfProcess = airHeatingResult.heatOfProcess();
-        Temperature actualOutAirTemp = airHeatingResult.outletAirFlow().getTemperature();
+        HeatingResult heatingResult = HeatingEquations.heatingFromRelativeHumidity(inletFlow, expectedOutRH);
+        Power actualHeatOfProcess = heatingResult.heatOfProcess();
+        Temperature actualOutAirTemp = heatingResult.outletAirFlow().getTemperature();
 
         // Assert
         assertThat(actualHeatOfProcess.isEqualWithPrecision(expectedHeatOfProcess, 1E-9)).isTrue();

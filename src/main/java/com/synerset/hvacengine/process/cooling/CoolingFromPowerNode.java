@@ -8,7 +8,7 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
-import com.synerset.hvacengine.process.cooling.dataobject.NodeCoolingResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -20,7 +20,7 @@ public class CoolingFromPowerNode implements ProcessNode {
     private final InputConnector<CoolantData> coolantDataInputConnector;
     private final OutputConnector<FlowOfLiquidWater> outputCondensateConnector;
     private final InputConnector<Power> heatConnector;
-    private NodeCoolingResult coolingResult;
+    private CoolingNodeResult coolingResult;
 
     public CoolingFromPowerNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                 InputConnector<CoolantData> coolantDataConnector,
@@ -37,7 +37,7 @@ public class CoolingFromPowerNode implements ProcessNode {
     }
 
     @Override
-    public NodeCoolingResult runProcessCalculations() {
+    public CoolingNodeResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         coolantDataInputConnector.updateConnectorData();
         heatConnector.updateConnectorData();
@@ -56,7 +56,7 @@ public class CoolingFromPowerNode implements ProcessNode {
                 heatingPower
         );
 
-        NodeCoolingResult coolingProcessResult = NodeCoolingResult.builder()
+        CoolingNodeResult coolingProcessResult = CoolingNodeResult.builder()
                 .heatOfProcess(results.heatOfProcess())
                 .inletAirFlow(inletAirFlow)
                 .bypassFactor(results.bypassFactor())
@@ -71,7 +71,7 @@ public class CoolingFromPowerNode implements ProcessNode {
     }
 
     @Override
-    public NodeCoolingResult getProcessResults() {
+    public CoolingNodeResult getProcessResults() {
         return coolingResult;
     }
 

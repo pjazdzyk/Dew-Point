@@ -6,7 +6,7 @@ import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
-import com.synerset.hvacengine.process.heating.dataobject.AirHeatingResult;
+import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
@@ -16,7 +16,7 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     private InputConnector<Temperature> targetTemperatureConnector;
     private final OutputConnector<FlowOfHumidAir> outputAirFlowConnector;
     private final OutputConnector<Power> outputHeatConnector;
-    private AirHeatingResult heatingResult;
+    private HeatingResult heatingResult;
 
     public HeatingFromTemperatureNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                       InputConnector<Temperature> targetTemperatureConnector) {
@@ -30,12 +30,12 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     }
 
     @Override
-    public AirHeatingResult runProcessCalculations() {
+    public HeatingResult runProcessCalculations() {
         inputAirFlowConnector.updateConnectorData();
         targetTemperatureConnector.updateConnectorData();
         Temperature targetTemperature = targetTemperatureConnector.getConnectorData();
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
-        AirHeatingResult heatingProcessResults = HeatingEquations.heatingFromTargetTemperature(inletAirFlow, targetTemperature);
+        HeatingResult heatingProcessResults = HeatingEquations.heatingFromTargetTemperature(inletAirFlow, targetTemperature);
         outputAirFlowConnector.setConnectorData(heatingProcessResults.outletAirFlow());
         outputHeatConnector.setConnectorData(heatingProcessResults.heatOfProcess());
         this.heatingResult = heatingProcessResults;
@@ -43,7 +43,7 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     }
 
     @Override
-    public AirHeatingResult getProcessResults() {
+    public HeatingResult getProcessResults() {
         return heatingResult;
     }
 

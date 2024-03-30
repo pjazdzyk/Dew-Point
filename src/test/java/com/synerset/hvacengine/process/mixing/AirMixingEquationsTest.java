@@ -3,7 +3,7 @@ package com.synerset.hvacengine.process.mixing;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
-import com.synerset.hvacengine.process.mixing.dataobject.AirMixingResult;
+import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -47,7 +47,7 @@ class AirMixingEquationsTest {
         Temperature expectedOutTemp = Temperature.ofCelsius(expectedOutAirTempVal);
 
         // When
-        AirMixingResult mixingResult = MixingEquations.mixingOfTwoAirFlows(airFlow_in, airFlow_rec);
+        MixingResult mixingResult = MixingEquations.mixingOfTwoAirFlows(airFlow_in, airFlow_rec);
         FlowOfHumidAir actualOutletFlow = mixingResult.outletAirFlow();
 
         MassFlow actualOutDryAirMassFlow = actualOutletFlow.getDryAirMassFlow();
@@ -75,7 +75,7 @@ class AirMixingEquationsTest {
                 .getValue());
 
         // When
-        AirMixingResult mixingResult = MixingEquations.mixingOfMultipleFlows(inletFlow, recircFlow_1, recircFlow_2);
+        MixingResult mixingResult = MixingEquations.mixingOfMultipleFlows(inletFlow, recircFlow_1, recircFlow_2);
         FlowOfHumidAir actualOutletFlow = mixingResult.outletAirFlow();
 
         // Then

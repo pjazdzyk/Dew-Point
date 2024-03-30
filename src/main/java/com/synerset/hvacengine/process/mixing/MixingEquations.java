@@ -5,7 +5,7 @@ import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
-import com.synerset.hvacengine.process.mixing.dataobject.AirMixingResult;
+import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
@@ -21,7 +21,7 @@ public class MixingEquations {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AirMixingResult mixingOfTwoAirFlows(FlowOfHumidAir inletAir, FlowOfHumidAir recirculationAirFlow) {
+    public static MixingResult mixingOfTwoAirFlows(FlowOfHumidAir inletAir, FlowOfHumidAir recirculationAirFlow) {
         Validators.requireNotNull(inletAir);
         Validators.requireNotNull(recirculationAirFlow);
         MassFlow totalMassFlow = inletAir.getMassFlow().plus(recirculationAirFlow.getMassFlow());
@@ -32,7 +32,7 @@ public class MixingEquations {
         double mdaOut = mdaIn + mdaRec;
 
         if (mdaIn == 0.0) {
-            return AirMixingResult.builder()
+            return MixingResult.builder()
                     .inletAirFlow(inletAir)
                     .outletAirFlow(recirculationAirFlow)
                     .recirculationFlows(List.of(recirculationAirFlow))
@@ -40,7 +40,7 @@ public class MixingEquations {
         }
 
         if (mdaRec == 0.0 || mdaOut == 0.0) {
-            return AirMixingResult.builder()
+            return MixingResult.builder()
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
                     .recirculationFlows(List.of(recirculationAirFlow))
@@ -63,18 +63,18 @@ public class MixingEquations {
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
-        return AirMixingResult.builder()
+        return MixingResult.builder()
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
                 .recirculationFlows(List.of(recirculationAirFlow))
                 .build();
     }
 
-    public static AirMixingResult mixingOfMultipleFlows(FlowOfHumidAir inletAir, List<FlowOfHumidAir> recirculationAirFlows) {
+    public static MixingResult mixingOfMultipleFlows(FlowOfHumidAir inletAir, Collection<FlowOfHumidAir> recirculationAirFlows) {
         Validators.requireNotNull(inletAir);
 
         if (recirculationAirFlows == null || recirculationAirFlows.isEmpty()) {
-            return AirMixingResult.builder()
+            return MixingResult.builder()
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
                     .recirculationFlows(recirculationAirFlows)
@@ -110,14 +110,14 @@ public class MixingEquations {
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
-        return AirMixingResult.builder()
+        return MixingResult.builder()
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
                 .recirculationFlows(recirculationAirFlows)
                 .build();
     }
 
-    public static AirMixingResult mixingOfMultipleFlows(FlowOfHumidAir inletAir, FlowOfHumidAir... recirculationAirFlows) {
+    public static MixingResult mixingOfMultipleFlows(FlowOfHumidAir inletAir, FlowOfHumidAir... recirculationAirFlows) {
         return mixingOfMultipleFlows(inletAir, Arrays.stream(recirculationAirFlows).toList());
     }
 
