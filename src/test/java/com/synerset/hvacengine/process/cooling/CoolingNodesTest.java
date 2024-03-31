@@ -53,6 +53,7 @@ class CoolingNodesTest {
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
         assertThat(processResults.heatOfProcess().getInWatts()).isEqualTo(expectedPower.getInWatts(), withPrecision(1E-9));
+        assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -93,6 +94,7 @@ class CoolingNodesTest {
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
         assertThat(processResults.heatOfProcess()).isEqualTo(inputPower);
+        assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -125,6 +127,7 @@ class CoolingNodesTest {
         // When
         CoolingFromHumidityNode coolingFromHumidityNode = CoolingFromHumidityNode.of(TEST_INLET_AIR_FLOW, coolantData, targetRH);
         CoolingNodeResult processResults = coolingFromHumidityNode.runProcessCalculations();
+        assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
 
         // Then
         assertThat(processResults).isNotNull();

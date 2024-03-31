@@ -59,6 +59,7 @@ public class CoolingFromPowerNode implements ProcessNode {
         CoolingNodeResult coolingProcessResult = CoolingNodeResult.builder()
                 .heatOfProcess(results.heatOfProcess())
                 .inletAirFlow(inletAirFlow)
+                .averageCoilWallTemperature(coolantData.getAverageTemperature())
                 .bypassFactor(results.bypassFactor())
                 .condensateFlow(results.condensateFlow())
                 .outletAirFlow(results.outletAirFlow())

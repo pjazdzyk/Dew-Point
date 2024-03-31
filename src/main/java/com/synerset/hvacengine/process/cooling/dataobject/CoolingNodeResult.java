@@ -6,6 +6,7 @@ import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
+import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
 /**
  * Represents the result of an air cooling process.
@@ -16,6 +17,7 @@ public record CoolingNodeResult(FlowOfHumidAir inletAirFlow,
                                 FlowOfLiquidWater condensateFlow,
                                 FlowOfLiquidWater coolantSupplyFlow,
                                 FlowOfLiquidWater coolantReturnFlow,
+                                Temperature averageCoilWallTemperature,
                                 BypassFactor bypassFactor) implements ProcessResult {
 
     @Override
@@ -30,6 +32,7 @@ public record CoolingNodeResult(FlowOfHumidAir inletAirFlow,
         private FlowOfLiquidWater condensateFlow;
         private FlowOfLiquidWater coolantSupplyFlow;
         private FlowOfLiquidWater coolantReturnFlow;
+        private Temperature averageCoilWallTemperature;
         private BypassFactor bypassFactor;
 
         public Builder inletAirFlow(FlowOfHumidAir inletAirFlow) {
@@ -62,6 +65,11 @@ public record CoolingNodeResult(FlowOfHumidAir inletAirFlow,
             return this;
         }
 
+        public Builder averageCoilWallTemperature(Temperature averageCoilWallTemperature) {
+            this.averageCoilWallTemperature = averageCoilWallTemperature;
+            return this;
+        }
+
         public Builder bypassFactor(BypassFactor bypassFactor) {
             this.bypassFactor = bypassFactor;
             return this;
@@ -69,7 +77,7 @@ public record CoolingNodeResult(FlowOfHumidAir inletAirFlow,
 
         public CoolingNodeResult build() {
             return new CoolingNodeResult(inletAirFlow, outletAirFlow, heatOfProcess, condensateFlow,
-                    coolantSupplyFlow, coolantReturnFlow, bypassFactor);
+                    coolantSupplyFlow, coolantReturnFlow, averageCoilWallTemperature, bypassFactor);
         }
     }
 

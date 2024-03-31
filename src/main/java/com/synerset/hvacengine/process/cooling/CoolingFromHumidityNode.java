@@ -64,6 +64,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
                 .inletAirFlow(inletAirFlow)
                 .heatOfProcess(results.heatOfProcess())
                 .bypassFactor(results.bypassFactor())
+                .averageCoilWallTemperature(coolantData.getAverageTemperature())
                 .condensateFlow(results.condensateFlow())
                 .outletAirFlow(results.outletAirFlow())
                 .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(coolantData.getSupplyTemperature()), coolantMassFlow))

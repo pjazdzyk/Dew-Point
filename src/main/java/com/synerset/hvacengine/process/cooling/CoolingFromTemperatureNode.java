@@ -64,6 +64,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(results.outletAirFlow())
                 .heatOfProcess(results.heatOfProcess())
+                .averageCoilWallTemperature(coolantData.getAverageTemperature())
                 .bypassFactor(results.bypassFactor())
                 .condensateFlow(results.condensateFlow())
                 .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(coolantData.getSupplyTemperature()), coolantMassFlow))
