@@ -1,4 +1,4 @@
-package com.synerset.hvacengine.process.common;
+package com.synerset.hvacengine.process;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;

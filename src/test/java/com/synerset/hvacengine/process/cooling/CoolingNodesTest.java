@@ -5,6 +5,8 @@ import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWaterEquations;
+import com.synerset.hvacengine.process.ProcessMode;
+import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
@@ -54,6 +56,8 @@ class CoolingNodesTest {
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
         assertThat(processResults.heatOfProcess().getInWatts()).isEqualTo(expectedPower.getInWatts(), withPrecision(1E-9));
         assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
+        assertThat(processResults.processType()).isEqualTo(ProcessType.COOLING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_TEMPERATURE);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -95,6 +99,8 @@ class CoolingNodesTest {
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
         assertThat(processResults.heatOfProcess()).isEqualTo(inputPower);
         assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
+        assertThat(processResults.processType()).isEqualTo(ProcessType.COOLING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_POWER);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -134,6 +140,8 @@ class CoolingNodesTest {
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
         assertThat(processResults.heatOfProcess().getInWatts()).isEqualTo(expectedPower.getInWatts(), withPrecision(1.8E-6));
+        assertThat(processResults.processType()).isEqualTo(ProcessType.COOLING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_HUMIDITY);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());

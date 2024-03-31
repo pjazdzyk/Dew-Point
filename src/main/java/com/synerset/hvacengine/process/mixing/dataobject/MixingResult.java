@@ -1,8 +1,10 @@
 package com.synerset.hvacengine.process.mixing.dataobject;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.process.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessResult;
-import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 import java.util.ArrayList;
@@ -11,7 +13,9 @@ import java.util.Collection;
 /**
  * The AirMixingResult record represents the result of a mixing process.
  */
-public record MixingResult(FlowOfHumidAir inletAirFlow,
+public record MixingResult(ProcessType processType,
+                           ProcessMode processMode,
+                           FlowOfHumidAir inletAirFlow,
                            FlowOfHumidAir outletAirFlow,
                            Power heatOfProcess,
                            Collection<FlowOfHumidAir> recirculationFlows) implements ProcessResult {
@@ -22,6 +26,8 @@ public record MixingResult(FlowOfHumidAir inletAirFlow,
     }
 
     public static class AirMixingResultBuilder {
+        private static final ProcessType processType = ProcessType.MIXING;
+        private ProcessMode processMode;
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess = Power.ofWatts(0);
@@ -29,6 +35,11 @@ public record MixingResult(FlowOfHumidAir inletAirFlow,
 
         public AirMixingResultBuilder() {
             recirculationFlows = new ArrayList<>();
+        }
+
+        public AirMixingResultBuilder processMode(ProcessMode processMode) {
+            this.processMode = processMode;
+            return this;
         }
 
         public AirMixingResultBuilder inletAirFlow(FlowOfHumidAir inletAirFlow) {
@@ -52,9 +63,8 @@ public record MixingResult(FlowOfHumidAir inletAirFlow,
         }
 
         public MixingResult build() {
-            return new MixingResult(inletAirFlow, outletAirFlow, heatOfProcess, recirculationFlows);
+            return new MixingResult(processType, processMode, inletAirFlow, outletAirFlow, heatOfProcess, recirculationFlows);
         }
-
     }
 
     public static AirMixingResultBuilder builder() {

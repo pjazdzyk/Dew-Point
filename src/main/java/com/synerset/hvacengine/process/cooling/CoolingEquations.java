@@ -10,6 +10,7 @@ import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWaterEquations;
+import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
@@ -40,6 +41,7 @@ public class CoolingEquations {
 
         if (inputPower.isEqualZero() || inletAirFlow.getMassFlow().isEqualZero()) {
             return DryCoolingResult.builder()
+                    .processMode(ProcessMode.FROM_POWER)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(inputPower)
@@ -58,6 +60,7 @@ public class CoolingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, inletAirFlow.getDryAirMassFlow());
 
         return DryCoolingResult.builder()
+                .processMode(ProcessMode.FROM_POWER)
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(outletFlow)
                 .heatOfProcess(inputPower)
@@ -78,6 +81,7 @@ public class CoolingEquations {
         // The Target temperature must be lower than inlet temperature for a valid cooling case.
         if (targetTemperature.isEqualOrGreaterThan(inletAirFlow.getTemperature()) || inletAirFlow.getMassFlow().isEqualZero()) {
             return DryCoolingResult.builder()
+                    .processMode(ProcessMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
@@ -87,6 +91,7 @@ public class CoolingEquations {
         // If the target temperature is below dew point temperature, it is certain that this is no longer dry cooling
         if (targetTemperature.isLowerThan(inletAirFlow.getFluid().getDewPointTemperature())) {
             return DryCoolingResult.builder()
+                    .processMode(ProcessMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
@@ -106,6 +111,7 @@ public class CoolingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaIn));
 
         return DryCoolingResult.builder()
+                .processMode(ProcessMode.FROM_TEMPERATURE)
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(outletFlow)
                 .heatOfProcess(requiredHeat)
@@ -145,6 +151,7 @@ public class CoolingEquations {
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(inletCoolantData.getAverageTemperature(), inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
             return RealCoolingResult.builder()
+                    .processMode(ProcessMode.FROM_POWER)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(inputPower)
@@ -167,7 +174,7 @@ public class CoolingEquations {
             return calculatedQ.getInWatts() - inputPower.getInWatts();
         });
 
-        return coolingResults[0];
+        return coolingResults[0].withProcessMode(ProcessMode.FROM_POWER);
     }
 
     /**
@@ -203,6 +210,7 @@ public class CoolingEquations {
         BypassFactor bypassFactor = coilBypassFactor(averageWallTemp, inletHumidAir.getTemperature(), targetTemperature);
         if (tOut == tIn || inletAirFlow.getMassFlow().isEqualZero()) {
             return RealCoolingResult.builder()
+                    .processMode(ProcessMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
@@ -256,6 +264,7 @@ public class CoolingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, inletAirFlow.getFlowOfDryAir().getMassFlow());
 
         return RealCoolingResult.builder()
+                .processMode(ProcessMode.FROM_TEMPERATURE)
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(outletFlow)
                 .heatOfProcess(Power.ofKiloWatts(qCool))
@@ -295,6 +304,7 @@ public class CoolingEquations {
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(averageWallTemp, inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
             return RealCoolingResult.builder()
+                    .processMode(ProcessMode.FROM_HUMIDITY)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
@@ -322,7 +332,7 @@ public class CoolingEquations {
             return rhOut - actualRH;
         });
 
-        return coolingResults[0];
+        return coolingResults[0].withProcessMode(ProcessMode.FROM_HUMIDITY);
     }
 
     // Helpers & tools

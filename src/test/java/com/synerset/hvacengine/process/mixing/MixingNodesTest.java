@@ -2,6 +2,8 @@ package com.synerset.hvacengine.process.mixing;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.process.ProcessMode;
+import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
@@ -60,6 +62,8 @@ class MixingNodesTest {
         assertThat(processResults.inletAirFlow()).isEqualTo(inletFlow);
         assertThat(processResults.heatOfProcess()).isEqualTo(Power.ofWatts(0));
         assertThat(actualMixingFlows).hasSize(1);
+        assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.MULTIPLE_MIXING);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(inletAir.getPressure());
@@ -114,6 +118,8 @@ class MixingNodesTest {
         // When
         MixingNode mixingNode = MixingNode.of(inletFlow, List.of(recirculationFlow1, recirculationFlow2));
         MixingResult processResults = mixingNode.runProcessCalculations();
+        assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.MULTIPLE_MIXING);
 
         // Then
         assertThat(processResults).isNotNull();

@@ -4,7 +4,7 @@ import com.synerset.hvacengine.common.Validators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
-import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
@@ -61,6 +61,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
         );
 
         CoolingNodeResult coolingProcessResult = CoolingNodeResult.builder()
+                .processMode(results.processMode())
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(results.outletAirFlow())
                 .heatOfProcess(results.heatOfProcess())

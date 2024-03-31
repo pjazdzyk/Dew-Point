@@ -2,7 +2,7 @@ package com.synerset.hvacengine.process.heating;
 
 import com.synerset.hvacengine.common.Validators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;

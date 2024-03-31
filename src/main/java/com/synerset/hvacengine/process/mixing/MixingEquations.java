@@ -5,6 +5,7 @@ import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
+import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
@@ -33,6 +34,7 @@ public class MixingEquations {
 
         if (mdaIn == 0.0) {
             return MixingResult.builder()
+                    .processMode(ProcessMode.SIMPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(recirculationAirFlow)
                     .recirculationFlows(List.of(recirculationAirFlow))
@@ -41,6 +43,7 @@ public class MixingEquations {
 
         if (mdaRec == 0.0 || mdaOut == 0.0) {
             return MixingResult.builder()
+                    .processMode(ProcessMode.SIMPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
                     .recirculationFlows(List.of(recirculationAirFlow))
@@ -64,6 +67,7 @@ public class MixingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
         return MixingResult.builder()
+                .processMode(ProcessMode.SIMPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
                 .recirculationFlows(List.of(recirculationAirFlow))
@@ -75,6 +79,7 @@ public class MixingEquations {
 
         if (recirculationAirFlows == null || recirculationAirFlows.isEmpty()) {
             return MixingResult.builder()
+                    .processMode(ProcessMode.MULTIPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
                     .recirculationFlows(recirculationAirFlows)
@@ -111,6 +116,7 @@ public class MixingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
         return MixingResult.builder()
+                .processMode(ProcessMode.MULTIPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
                 .recirculationFlows(recirculationAirFlows)

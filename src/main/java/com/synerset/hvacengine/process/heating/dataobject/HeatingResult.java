@@ -1,14 +1,18 @@
 package com.synerset.hvacengine.process.heating.dataobject;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessResult;
-import com.synerset.hvacengine.process.common.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 /**
  * Represents the result of an air heating process.
  */
-public record HeatingResult(FlowOfHumidAir inletAirFlow,
+public record HeatingResult(ProcessType processType,
+                            ProcessMode processMode,
+                            FlowOfHumidAir inletAirFlow,
                             FlowOfHumidAir outletAirFlow,
                             Power heatOfProcess) implements ProcessResult {
     @Override
@@ -16,33 +20,40 @@ public record HeatingResult(FlowOfHumidAir inletAirFlow,
         return ConsoleOutputFormatters.heatingConsoleOutput(this);
     }
 
-    public static class AirHeatingResultBuilder {
+    public static class Builder {
+        private static final ProcessType processType = ProcessType.HEATING;
+        private ProcessMode processMode;
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess;
 
-        public AirHeatingResultBuilder inletAirFlow(FlowOfHumidAir inletAirFlow) {
+        public Builder processMode(ProcessMode processMode){
+            this.processMode = processMode;
+            return this;
+        }
+
+        public Builder inletAirFlow(FlowOfHumidAir inletAirFlow) {
             this.inletAirFlow = inletAirFlow;
             return this;
         }
 
-        public AirHeatingResultBuilder outletAirFlow(FlowOfHumidAir outletAirFlow) {
+        public Builder outletAirFlow(FlowOfHumidAir outletAirFlow) {
             this.outletAirFlow = outletAirFlow;
             return this;
         }
 
-        public AirHeatingResultBuilder heatOfProcess(Power heatOfProcess) {
+        public Builder heatOfProcess(Power heatOfProcess) {
             this.heatOfProcess = heatOfProcess;
             return this;
         }
 
         public HeatingResult build() {
-            return new HeatingResult(inletAirFlow, outletAirFlow, heatOfProcess);
+            return new HeatingResult(processType, processMode, inletAirFlow, outletAirFlow, heatOfProcess);
         }
     }
 
-    public static AirHeatingResultBuilder builder(){
-        return new AirHeatingResultBuilder();
+    public static Builder builder(){
+        return new Builder();
     }
 
 }

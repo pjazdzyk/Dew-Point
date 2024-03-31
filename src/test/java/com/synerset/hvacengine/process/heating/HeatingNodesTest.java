@@ -3,6 +3,8 @@ package com.synerset.hvacengine.process.heating;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
+import com.synerset.hvacengine.process.ProcessMode;
+import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -48,6 +50,8 @@ class HeatingNodesTest {
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_FLOW);
         assertThat(processResults.heatOfProcess()).isEqualTo(inputPower);
+        assertThat(processResults.processType()).isEqualTo(ProcessType.HEATING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_POWER);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -75,6 +79,8 @@ class HeatingNodesTest {
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_FLOW);
         assertThat(processResults.heatOfProcess().getValue()).isEqualTo(expectedPower.getInWatts(), withPrecision(1E-10));
+        assertThat(processResults.processType()).isEqualTo(ProcessType.HEATING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_TEMPERATURE);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -103,6 +109,8 @@ class HeatingNodesTest {
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_FLOW);
         assertThat(processResults.heatOfProcess().getValue()).isEqualTo(expectedPower.getValue(), withPrecision(1E-9));
+        assertThat(processResults.processType()).isEqualTo(ProcessType.HEATING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_HUMIDITY);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
