@@ -1,7 +1,6 @@
 package com.synerset.hvacengine.process.mixing;
 
-import com.synerset.hvacengine.common.Validators;
-import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
@@ -23,23 +22,14 @@ public class MixingEquations {
     }
 
     public static MixingResult mixingOfTwoAirFlows(FlowOfHumidAir inletAir, FlowOfHumidAir recirculationAirFlow) {
-        Validators.requireNotNull(inletAir);
-        Validators.requireNotNull(recirculationAirFlow);
+        CommonValidators.requireNotNull(inletAir);
+        CommonValidators.requireNotNull(recirculationAirFlow);
         MassFlow totalMassFlow = inletAir.getMassFlow().plus(recirculationAirFlow.getMassFlow());
-        Validators.requireBelowUpperBoundInclusive(totalMassFlow, FlowOfHumidAir.MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireBelowUpperBoundInclusive(totalMassFlow, FlowOfHumidAir.MASS_FLOW_MAX_LIMIT);
 
         double mdaIn = inletAir.getDryAirMassFlow().getInKilogramsPerSecond();
         double mdaRec = recirculationAirFlow.getDryAirMassFlow().getInKilogramsPerSecond();
         double mdaOut = mdaIn + mdaRec;
-
-        if (mdaIn == 0.0) {
-            return MixingResult.builder()
-                    .processMode(ProcessMode.SIMPLE_MIXING)
-                    .inletAirFlow(inletAir)
-                    .outletAirFlow(recirculationAirFlow)
-                    .recirculationFlows(List.of(recirculationAirFlow))
-                    .build();
-        }
 
         if (mdaRec == 0.0 || mdaOut == 0.0) {
             return MixingResult.builder()
@@ -75,9 +65,9 @@ public class MixingEquations {
     }
 
     public static MixingResult mixingOfMultipleFlows(FlowOfHumidAir inletAir, Collection<FlowOfHumidAir> recirculationAirFlows) {
-        Validators.requireNotNull(inletAir);
+        CommonValidators.requireNotNull(inletAir);
 
-        if (recirculationAirFlows == null || recirculationAirFlows.isEmpty()) {
+        if (recirculationAirFlows == null || recirculationAirFlows.isEmpty() || inletAir.getMassFlow().isCloseToZero() || sumOfAllFlows(recirculationAirFlows).isCloseToZero()) {
             return MixingResult.builder()
                     .processMode(ProcessMode.MULTIPLE_MIXING)
                     .inletAirFlow(inletAir)
@@ -87,7 +77,7 @@ public class MixingEquations {
         }
 
         MassFlow totalMassFlow = sumOfAllFlows(recirculationAirFlows).plus(inletAir.getMassFlow());
-        Validators.requireBelowUpperBoundInclusive(totalMassFlow, FlowOfHumidAir.MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireBelowUpperBoundInclusive(totalMassFlow, FlowOfHumidAir.MASS_FLOW_MAX_LIMIT);
 
         double mdaOut = inletAir.getDryAirMassFlow().getInKilogramsPerSecond();
         double xMda = mdaOut * inletAir.getHumidityRatio().getInKilogramPerKilogram();
@@ -99,10 +89,6 @@ public class MixingEquations {
             xMda += flow.getDryAirMassFlow().getInKilogramsPerSecond() * flow.getFluid().getHumidityRatio().getInKilogramPerKilogram();
             iMda += flow.getDryAirMassFlow().getInKilogramsPerSecond() * flow.getFluid().getSpecificEnthalpy().getInKiloJoulesPerKiloGram();
             pOut = Double.max(pOut, flow.getPressure().getInPascals());
-        }
-
-        if (mdaOut == 0) {
-            throw new HvacEngineArgumentException(String.format("Sum of all dry air mass recirculationFlows. %s", mdaOut));
         }
 
         double xOut = xMda / mdaOut;

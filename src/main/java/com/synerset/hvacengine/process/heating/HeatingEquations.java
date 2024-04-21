@@ -1,7 +1,6 @@
 package com.synerset.hvacengine.process.heating;
 
-import com.synerset.hvacengine.common.Validators;
-import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
@@ -10,8 +9,12 @@ import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
-import com.synerset.unitility.unitsystem.thermodynamic.SpecificEnthalpy;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
+
+import static com.synerset.hvacengine.process.heating.HeatingValidators.requirePhysicalInputPowerForHeating;
+import static com.synerset.hvacengine.process.heating.HeatingValidators.requireValidInputPowerForHeating;
+import static com.synerset.hvacengine.process.heating.HeatingValidators.requireValidTargetRelativeHumidityForHeating;
+import static com.synerset.hvacengine.process.heating.HeatingValidators.requireValidTargetTemperatureForHeating;
 
 public class HeatingEquations {
 
@@ -28,26 +31,12 @@ public class HeatingEquations {
      * @param inputPower   heating {@link Power}
      */
     public static HeatingResult heatingFromPower(FlowOfHumidAir inletAirFlow, Power inputPower) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(inputPower);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(inputPower);
+        requireValidInputPowerForHeating(inputPower);
+        requirePhysicalInputPowerForHeating(inletAirFlow, inputPower);
 
-        if (inputPower.isNegative()) {
-            throw new HvacEngineArgumentException("Heating power must be positive value. Q_in = " + inputPower);
-        }
-
-        // Mox heating power estimate to reach t_max: Qheat.max= G * (imax - i_in)
-        Temperature tMax = HumidAirEquations.dryBulbTemperatureMax(inletAirFlow.getPressure()).multiply(0.98);
-        SpecificEnthalpy iMax = HumidAirEquations.specificEnthalpy(tMax, inletAirFlow.getHumidityRatio(),
-                inletAirFlow.getPressure());
-        double qMax = iMax.minus(inletAirFlow.getSpecificEnthalpy())
-                .multiply(inletAirFlow.getMassFlow().toKilogramsPerSecond());
-        Power estimatedPowerLimit = Power.ofKiloWatts(qMax);
-        if (inputPower.isGreaterThan(estimatedPowerLimit)) {
-            throw new HvacEngineArgumentException("To large heating power for provided flow. "
-                                                  + "Q_in = " + inputPower + " Q_limit = " + estimatedPowerLimit);
-        }
-
-        if (inputPower.isEqualZero() || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero()) {
             return HeatingResult.builder()
                     .processMode(ProcessMode.FROM_POWER)
                     .inletAirFlow(inletAirFlow)
@@ -85,17 +74,12 @@ public class HeatingEquations {
      * @param targetTemperature target outlet {@link Temperature}
      */
     public static HeatingResult heatingFromTargetTemperature(FlowOfHumidAir inletAirFlow, Temperature targetTemperature) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(targetTemperature);
-        Validators.requireBelowUpperBoundInclusive(targetTemperature, HumidAir.TEMPERATURE_MAX_LIMIT);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(targetTemperature);
+        CommonValidators.requireBelowUpperBoundInclusive(targetTemperature, HumidAir.TEMPERATURE_MAX_LIMIT);
+        requireValidTargetTemperatureForHeating(inletAirFlow.getTemperature(), targetTemperature);
 
-        if (targetTemperature.isLowerThan(inletAirFlow.getTemperature())) {
-            throw new HvacEngineArgumentException("Expected outlet temperature must be greater than inlet for cooling process." +
-                                                  " DBT_in = " + inletAirFlow.getRelativeHumidity() +
-                                                  " DBT_target = " + inletAirFlow.getTemperature());
-        }
-
-        if (inletAirFlow.getTemperature().equals(targetTemperature) || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (inletAirFlow.getTemperature().equals(targetTemperature) || inletAirFlow.getMassFlow().isCloseToZero()) {
             return HeatingResult.builder()
                     .processMode(ProcessMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
@@ -141,16 +125,12 @@ public class HeatingEquations {
      * @param targetRelativeHumidity target {@link RelativeHumidity}
      */
     public static HeatingResult heatingFromRelativeHumidity(FlowOfHumidAir inletAirFlow, RelativeHumidity targetRelativeHumidity) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(targetRelativeHumidity);
-        Validators.requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(98));
-        if (targetRelativeHumidity.isGreaterThan(inletAirFlow.getRelativeHumidity())) {
-            throw new HvacEngineArgumentException("Heating process cannot increase relative humidity." +
-                                                  " RH_in = " + inletAirFlow.getRelativeHumidity() +
-                                                  " RH_target = " + targetRelativeHumidity);
-        }
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(targetRelativeHumidity);
+        CommonValidators.requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(98));
+        requireValidTargetRelativeHumidityForHeating(inletAirFlow.getRelativeHumidity(), targetRelativeHumidity);
 
-        if (inletAirFlow.getRelativeHumidity().equals(targetRelativeHumidity) || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (inletAirFlow.getRelativeHumidity().equals(targetRelativeHumidity) || inletAirFlow.getMassFlow().isCloseToZero()) {
             return HeatingResult.builder()
                     .processMode(ProcessMode.FROM_HUMIDITY)
                     .inletAirFlow(inletAirFlow)

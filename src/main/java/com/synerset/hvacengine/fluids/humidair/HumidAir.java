@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.humidair;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Fluid;
 import com.synerset.hvacengine.fluids.SharedEquations;
 import com.synerset.hvacengine.fluids.dryair.DryAir;
@@ -11,6 +11,7 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
+import static com.synerset.hvacengine.fluids.FluidValidators.requireValidSaturationPressure;
 import static com.synerset.hvacengine.utils.Defaults.STANDARD_ATMOSPHERE;
 
 /**
@@ -44,22 +45,22 @@ public class HumidAir implements Fluid {
     /**
      * Constructs a `HumidAir` instance with the specified absolute pressure, dry bulb temperature, and humidity ratio.
      *
-     * @param pressure        The absolute pressure of the humid air in pascals (Pa).
-     * @param temperature The dry bulb temperature of the humid air in degrees Celsius (°C).
-     * @param humidityRatio      The humidity ratio of the humid air in kilograms of water vapor per kilogram of dry air (kg/kg).
+     * @param pressure      The absolute pressure of the humid air in pascals (Pa).
+     * @param temperature   The dry bulb temperature of the humid air in degrees Celsius (°C).
+     * @param humidityRatio The humidity ratio of the humid air in kilograms of water vapor per kilogram of dry air (kg/kg).
      */
     public HumidAir(Pressure pressure,
                     Temperature temperature,
                     HumidityRatio humidityRatio) {
 
-        Validators.requireNotNull(pressure);
-        Validators.requireNotNull(temperature);
-        Validators.requireNotNull(humidityRatio);
-        Validators.requireBetweenBoundsInclusive(pressure, PRESSURE_MIN_LIMIT, PRESSURE_MAX_LIMIT);
-        Validators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
-        Validators.requireBetweenBoundsInclusive(humidityRatio, HumidityRatio.HUM_RATIO_MIN_LIMIT, HUMIDITY_RATIO_MAX_LIMIT);
+        CommonValidators.requireNotNull(pressure);
+        CommonValidators.requireNotNull(temperature);
+        CommonValidators.requireNotNull(humidityRatio);
+        CommonValidators.requireBetweenBoundsInclusive(pressure, PRESSURE_MIN_LIMIT, PRESSURE_MAX_LIMIT);
+        CommonValidators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
+        CommonValidators.requireBetweenBoundsInclusive(humidityRatio, HumidityRatio.HUM_RATIO_MIN_LIMIT, HUMIDITY_RATIO_MAX_LIMIT);
         Pressure satPressure = HumidAirEquations.saturationPressure(temperature);
-        Validators.requireValidSaturationPressure(satPressure, pressure, temperature);
+        requireValidSaturationPressure(satPressure, pressure, temperature);
 
         this.pressure = pressure;
         this.temperature = temperature;
@@ -159,29 +160,29 @@ public class HumidAir implements Fluid {
         String end = "\n\t";
         int digits = 3;
         return "HumidAir:" + end +
-                pressure.toEngineeringFormat("P_abs", digits) + separator +
-                temperature.toEngineeringFormat("DBT", digits) + separator +
-                relativeHumidity.toEngineeringFormat("RH", digits) + separator +
-                humidityRatio.toEngineeringFormat("x", digits) + separator +
-                maxHumidityRatio.toEngineeringFormat("x\"", digits) + end +
+               pressure.toEngineeringFormat("P_abs", digits) + separator +
+               temperature.toEngineeringFormat("DBT", digits) + separator +
+               relativeHumidity.toEngineeringFormat("RH", digits) + separator +
+               humidityRatio.toEngineeringFormat("x", digits) + separator +
+               maxHumidityRatio.toEngineeringFormat("x\"", digits) + end +
 
-                saturationPressure.toEngineeringFormat("Ps", digits) + separator +
-                dewPointTemperature.toEngineeringFormat("WBT", digits) + separator +
-                wetBulbTemperature.toEngineeringFormat("TDP", digits) + separator +
-                "Vapour status: " + vapourState + end +
+               saturationPressure.toEngineeringFormat("Ps", digits) + separator +
+               dewPointTemperature.toEngineeringFormat("WBT", digits) + separator +
+               wetBulbTemperature.toEngineeringFormat("TDP", digits) + separator +
+               "Vapour status: " + vapourState + end +
 
-                specificEnthalpy.toEngineeringFormat("i", digits) + separator +
-                density.toEngineeringFormat("ρ", digits) + separator +
-                specificHeat.toEngineeringFormat("cp", digits) + end +
+               specificEnthalpy.toEngineeringFormat("i", digits) + separator +
+               density.toEngineeringFormat("ρ", digits) + separator +
+               specificHeat.toEngineeringFormat("cp", digits) + end +
 
-                kinematicViscosity.toEngineeringFormat("ν", digits) + separator +
-                dynamicViscosity.toEngineeringFormat("μ", digits) + separator +
-                thermalConductivity.toEngineeringFormat("k", digits) + end +
+               kinematicViscosity.toEngineeringFormat("ν", digits) + separator +
+               dynamicViscosity.toEngineeringFormat("μ", digits) + separator +
+               thermalConductivity.toEngineeringFormat("k", digits) + end +
 
-                thermalDiffusivity.toEngineeringFormat("α", digits) + separator +
-                prandtlNumber.toEngineeringFormat("Pr", digits) + end +
+               thermalDiffusivity.toEngineeringFormat("α", digits) + separator +
+               prandtlNumber.toEngineeringFormat("Pr", digits) + end +
 
-                dryAirComponent.toConsoleOutput();
+               dryAirComponent.toConsoleOutput();
     }
 
     @Override
@@ -190,8 +191,8 @@ public class HumidAir implements Fluid {
         if (o == null || getClass() != o.getClass()) return false;
         HumidAir that = (HumidAir) o;
         return Objects.equals(temperature, that.temperature)
-                && Objects.equals(pressure, that.pressure)
-                && Objects.equals(humidityRatio, that.humidityRatio);
+               && Objects.equals(pressure, that.pressure)
+               && Objects.equals(humidityRatio, that.humidityRatio);
     }
 
     @Override
@@ -202,25 +203,25 @@ public class HumidAir implements Fluid {
     @Override
     public String toString() {
         return "HumidAir{" +
-                "dryBulbTemperature=" + temperature +
-                ", absPressure=" + pressure +
-                ", density=" + density +
-                ", relativeHumidity=" + relativeHumidity +
-                ", saturationPressure=" + saturationPressure +
-                ", humidityRatio=" + humidityRatio +
-                ", maxHumidityRatio=" + maxHumidityRatio +
-                ", vapourState=" + vapourState +
-                ", wetBulbTemperature=" + wetBulbTemperature +
-                ", dewPointTemperature=" + dewPointTemperature +
-                ", specificHeat=" + specificHeat +
-                ", specificEnthalpy=" + specificEnthalpy +
-                ", dynamicViscosity=" + dynamicViscosity +
-                ", kinematicViscosity=" + kinematicViscosity +
-                ", thermalConductivity=" + thermalConductivity +
-                ", thermalDiffusivity=" + thermalDiffusivity +
-                ", prandtlNumber=" + prandtlNumber +
-                ", dryAirComponent=" + dryAirComponent +
-                '}';
+               "dryBulbTemperature=" + temperature +
+               ", absPressure=" + pressure +
+               ", density=" + density +
+               ", relativeHumidity=" + relativeHumidity +
+               ", saturationPressure=" + saturationPressure +
+               ", humidityRatio=" + humidityRatio +
+               ", maxHumidityRatio=" + maxHumidityRatio +
+               ", vapourState=" + vapourState +
+               ", wetBulbTemperature=" + wetBulbTemperature +
+               ", dewPointTemperature=" + dewPointTemperature +
+               ", specificHeat=" + specificHeat +
+               ", specificEnthalpy=" + specificEnthalpy +
+               ", dynamicViscosity=" + dynamicViscosity +
+               ", kinematicViscosity=" + kinematicViscosity +
+               ", thermalConductivity=" + thermalConductivity +
+               ", thermalDiffusivity=" + thermalDiffusivity +
+               ", prandtlNumber=" + prandtlNumber +
+               ", dryAirComponent=" + dryAirComponent +
+               '}';
     }
 
     // Custom equality check
@@ -228,7 +229,7 @@ public class HumidAir implements Fluid {
     public <K extends Fluid> boolean isEqualsWithPrecision(K fluid, double epsilon) {
         if (fluid instanceof HumidAir humidAir) {
             return Fluid.super.isEqualsWithPrecision(fluid, epsilon)
-                    && humidityRatio.isEqualWithPrecision(humidAir.humidityRatio, epsilon);
+                   && humidityRatio.isEqualWithPrecision(humidAir.humidityRatio, epsilon);
         } else {
             return Fluid.super.isEqualsWithPrecision(fluid, epsilon);
         }
@@ -280,9 +281,9 @@ public class HumidAir implements Fluid {
      * @return A `HumidAir` instance.
      */
     public static HumidAir of(Pressure pressure, Temperature dryBulbTemperature, RelativeHumidity relativeHumidity) {
-        Validators.requireBetweenBoundsInclusive(relativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.RH_MAX_LIMIT);
+        CommonValidators.requireBetweenBoundsInclusive(relativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.RH_MAX_LIMIT);
         Pressure satPressure = HumidAirEquations.saturationPressure(dryBulbTemperature);
-        Validators.requireValidSaturationPressure(satPressure, pressure, dryBulbTemperature);
+        requireValidSaturationPressure(satPressure, pressure, dryBulbTemperature);
         HumidityRatio humRatio = HumidAirEquations.humidityRatio(relativeHumidity, satPressure, pressure);
         return new HumidAir(pressure, dryBulbTemperature, humRatio);
     }

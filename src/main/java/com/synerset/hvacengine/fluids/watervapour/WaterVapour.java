@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.watervapour;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Fluid;
 import com.synerset.hvacengine.fluids.SharedEquations;
 import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
@@ -10,6 +10,7 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
+import static com.synerset.hvacengine.fluids.FluidValidators.requireValidSaturationPressure;
 import static com.synerset.hvacengine.utils.Defaults.STANDARD_ATMOSPHERE;
 
 public class WaterVapour implements Fluid {
@@ -31,10 +32,10 @@ public class WaterVapour implements Fluid {
                        Temperature temperature,
                        RelativeHumidity relativeHumidity) {
 
-        Validators.requireNotNull(pressure);
-        Validators.requireNotNull(temperature);
-        Validators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
-        Validators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
+        CommonValidators.requireNotNull(pressure);
+        CommonValidators.requireNotNull(temperature);
+        CommonValidators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
+        CommonValidators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
 
         this.pressure = pressure;
         this.temperature = temperature;
@@ -42,11 +43,11 @@ public class WaterVapour implements Fluid {
         if (Objects.isNull(relativeHumidity)) {
             this.density = WaterVapourEquations.density(temperature, pressure);
         } else {
-            Validators.requireBelowUpperBoundInclusive(temperature, TEMPERATURE_MAX_LIMIT_WITH_RH);
-            Validators.requireAboveLowerBound(relativeHumidity, RelativeHumidity.RH_MIN_LIMIT);
-            Validators.requireBelowUpperBoundInclusive(relativeHumidity, RelativeHumidity.RH_MAX_LIMIT);
+            CommonValidators.requireBelowUpperBoundInclusive(temperature, TEMPERATURE_MAX_LIMIT_WITH_RH);
+            CommonValidators.requireAboveLowerBound(relativeHumidity, RelativeHumidity.RH_MIN_LIMIT);
+            CommonValidators.requireBelowUpperBoundInclusive(relativeHumidity, RelativeHumidity.RH_MAX_LIMIT);
             Pressure saturationPressure = HumidAirEquations.saturationPressure(temperature);
-            Validators.requireValidSaturationPressure(saturationPressure, pressure, temperature);
+            requireValidSaturationPressure(saturationPressure, pressure, temperature);
             this.density = WaterVapourEquations.density(temperature, relativeHumidity, pressure);
         }
 

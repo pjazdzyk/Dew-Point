@@ -63,7 +63,7 @@ class MixingNodesTest {
         assertThat(processResults.heatOfProcess()).isEqualTo(Power.ofWatts(0));
         assertThat(actualMixingFlows).hasSize(1);
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
-        assertThat(processResults.processMode()).isEqualTo(ProcessMode.MULTIPLE_MIXING);
+        assertThat(processResults.processMode()).isEqualTo(ProcessMode.SIMPLE_MIXING);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(inletAir.getPressure());

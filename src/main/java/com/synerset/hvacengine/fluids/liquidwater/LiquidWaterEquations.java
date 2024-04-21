@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.liquidwater;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.unitility.unitsystem.thermodynamic.Density;
 import com.synerset.unitility.unitsystem.thermodynamic.SpecificEnthalpy;
 import com.synerset.unitility.unitsystem.thermodynamic.SpecificHeat;
@@ -43,7 +43,7 @@ public final class LiquidWaterEquations {
     }
 
     public static SpecificEnthalpy specificEnthalpy(Temperature temperature) {
-        Validators.requireNotNull(temperature);
+        CommonValidators.requireNotNull(temperature);
         double specificEnthalpyVal = specificEnthalpy(temperature.getInCelsius());
         return SpecificEnthalpy.ofKiloJoulePerKiloGram(specificEnthalpyVal);
     }
@@ -66,7 +66,7 @@ public final class LiquidWaterEquations {
     }
 
     public static Density density(Temperature temperature) {
-        Validators.requireNotNull(temperature);
+        CommonValidators.requireNotNull(temperature);
         double densityVal = density(temperature.getInCelsius());
         return Density.ofKilogramPerCubicMeter(densityVal);
     }
@@ -99,7 +99,7 @@ public final class LiquidWaterEquations {
     }
 
     public static SpecificHeat specificHeat(Temperature temperature) {
-        Validators.requireNotNull(temperature);
+        CommonValidators.requireNotNull(temperature);
         double specHeatVal = specificHeat(temperature.getInCelsius());
         return SpecificHeat.ofKiloJoulePerKiloGramKelvin(specHeatVal);
     }

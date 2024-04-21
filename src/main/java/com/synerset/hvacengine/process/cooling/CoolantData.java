@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.utils.MathUtils;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
@@ -16,10 +16,11 @@ public class CoolantData {
     private final Temperature averageTemperature;
 
     public CoolantData(Temperature supplyTemperature, Temperature returnTemperature) {
-        Validators.requireNotNull(supplyTemperature);
-        Validators.requireNotNull(returnTemperature);
-        Validators.requireBetweenBounds(supplyTemperature, COOLANT_MIN_TEMPERATURE, COOLANT_MAX_TEMPERATURE);
-        Validators.requireBetweenBounds(returnTemperature, COOLANT_MIN_TEMPERATURE, COOLANT_MAX_TEMPERATURE);
+        CommonValidators.requireNotNull(supplyTemperature);
+        CommonValidators.requireNotNull(returnTemperature);
+        CommonValidators.requireBetweenBounds(supplyTemperature, COOLANT_MIN_TEMPERATURE, COOLANT_MAX_TEMPERATURE);
+        CommonValidators.requireBetweenBounds(returnTemperature, COOLANT_MIN_TEMPERATURE, COOLANT_MAX_TEMPERATURE);
+        CoolingValidators.requireValidCoolantInputData(supplyTemperature, returnTemperature);
         this.supplyTemperature = supplyTemperature;
         this.returnTemperature = returnTemperature;
         this.averageTemperature = averageWallTemp(supplyTemperature, returnTemperature);

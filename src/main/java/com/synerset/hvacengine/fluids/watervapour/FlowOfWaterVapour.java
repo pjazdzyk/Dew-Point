@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.watervapour;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Flow;
 import com.synerset.hvacengine.fluids.FlowEquations;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
@@ -18,9 +18,9 @@ public class FlowOfWaterVapour implements Flow<WaterVapour> {
     private final VolumetricFlow volFlow;
 
     public FlowOfWaterVapour(WaterVapour waterVapour, MassFlow massFlow) {
-        Validators.requireNotNull(waterVapour);
-        Validators.requireNotNull(massFlow);
-        Validators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireNotNull(waterVapour);
+        CommonValidators.requireNotNull(massFlow);
+        CommonValidators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         this.waterVapour = waterVapour;
         this.massFlow = massFlow;
         this.volFlow = FlowEquations.massFlowToVolFlow(waterVapour.getDensity(), massFlow);
@@ -120,8 +120,8 @@ public class FlowOfWaterVapour implements Flow<WaterVapour> {
     }
 
     public static FlowOfWaterVapour of(WaterVapour waterVapour, VolumetricFlow volFlow) {
-        Validators.requireNotNull(waterVapour);
-        Validators.requireNotNull(volFlow);
+        CommonValidators.requireNotNull(waterVapour);
+        CommonValidators.requireNotNull(volFlow);
         MassFlow massFlow = FlowEquations.volFlowToMassFlow(waterVapour.getDensity(), volFlow);
         return new FlowOfWaterVapour(waterVapour, massFlow);
     }

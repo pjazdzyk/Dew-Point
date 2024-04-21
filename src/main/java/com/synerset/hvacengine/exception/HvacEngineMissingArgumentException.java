@@ -1,4 +1,4 @@
-package com.synerset.hvacengine.common.exception;
+package com.synerset.hvacengine.exception;
 
 public class HvacEngineMissingArgumentException extends RuntimeException {
     public HvacEngineMissingArgumentException(String message) {

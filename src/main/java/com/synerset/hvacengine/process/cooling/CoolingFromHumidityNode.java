@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
@@ -28,9 +28,9 @@ public class CoolingFromHumidityNode implements ProcessNode {
                                    InputConnector<CoolantData> coolantDataConnector,
                                    InputConnector<RelativeHumidity> targetRelativeHumidity) {
 
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(coolantDataConnector);
-        Validators.requireNotNull(targetRelativeHumidity);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(coolantDataConnector);
+        CommonValidators.requireNotNull(targetRelativeHumidity);
         this.targetRelativeHumidity = targetRelativeHumidity;
         this.inputAirFlowConnector = inputAirFlowConnector;
         this.coolantDataInputConnector = coolantDataConnector;
@@ -108,7 +108,7 @@ public class CoolingFromHumidityNode implements ProcessNode {
     }
 
     public void setTargetTemperature(RelativeHumidity targetRelativeHumidity) {
-        Validators.requireNotNull(targetRelativeHumidity);
+        CommonValidators.requireNotNull(targetRelativeHumidity);
         this.targetRelativeHumidity.setConnectorData(targetRelativeHumidity);
     }
 
@@ -116,9 +116,9 @@ public class CoolingFromHumidityNode implements ProcessNode {
                                              CoolantData coolantData,
                                              RelativeHumidity targetRelativeHumidity) {
 
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(targetRelativeHumidity);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(targetRelativeHumidity);
 
 
         return new CoolingFromHumidityNode(
@@ -133,9 +133,9 @@ public class CoolingFromHumidityNode implements ProcessNode {
                                              InputConnector<CoolantData> coolantData,
                                              InputConnector<RelativeHumidity> targetRelativeHumidity) {
 
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(targetRelativeHumidity);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(targetRelativeHumidity);
 
         return new CoolingFromHumidityNode(inletAirFlow, coolantData, targetRelativeHumidity);
     }
@@ -143,8 +143,8 @@ public class CoolingFromHumidityNode implements ProcessNode {
     public static CoolingFromHumidityNode of(CoolantData coolantData,
                                              RelativeHumidity targetRelativeHumidity) {
 
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(targetRelativeHumidity);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(targetRelativeHumidity);
 
         return new CoolingFromHumidityNode(
                 InputConnector.createEmpty(FlowOfHumidAir.class),

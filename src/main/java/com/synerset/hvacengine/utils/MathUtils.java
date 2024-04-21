@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.utils;
 
-import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
+import com.synerset.hvacengine.exception.HvacEngineArgumentException;
 
 import java.util.Arrays;
 import java.util.OptionalDouble;

@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.solids.ice;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
@@ -26,10 +26,10 @@ public class Ice {
      * @param temperature The temperature of the ice (must be above or equal to the minimum limit).
      */
     public Ice(Pressure pressure, Temperature temperature) {
-        Validators.requireNotNull(pressure);
-        Validators.requireNotNull(temperature);
-        Validators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
-        Validators.requireAboveLowerBoundInclusive(temperature, TEMPERATURE_MIN_LIMIT);
+        CommonValidators.requireNotNull(pressure);
+        CommonValidators.requireNotNull(temperature);
+        CommonValidators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
+        CommonValidators.requireAboveLowerBoundInclusive(temperature, TEMPERATURE_MIN_LIMIT);
         this.temperature = temperature;
         this.pressure = pressure;
         this.density = IceEquations.density(temperature);

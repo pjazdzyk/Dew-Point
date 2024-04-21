@@ -1,7 +1,7 @@
 package com.synerset.hvacengine.fluids.liquidwater;
 
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Flow;
 import com.synerset.hvacengine.fluids.FlowEquations;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
@@ -30,9 +30,9 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
      * @throws IllegalArgumentException If either liquidWater or massFlow is null or if massFlow is out of bounds.
      */
     public FlowOfLiquidWater(LiquidWater liquidWater, MassFlow massFlow) {
-        Validators.requireNotNull(liquidWater);
-        Validators.requireNotNull(massFlow);
-        Validators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireNotNull(liquidWater);
+        CommonValidators.requireNotNull(massFlow);
+        CommonValidators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         this.liquidWater = liquidWater;
         this.massFlow = massFlow;
         this.volFlow = FlowEquations.massFlowToVolFlow(liquidWater.getDensity(), massFlow);
@@ -177,14 +177,14 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
      * @throws IllegalArgumentException If either liquidWater or volFlow is null.
      */
     public static FlowOfLiquidWater of(LiquidWater liquidWater, VolumetricFlow volFlow) {
-        Validators.requireNotNull(liquidWater);
-        Validators.requireNotNull(volFlow);
+        CommonValidators.requireNotNull(liquidWater);
+        CommonValidators.requireNotNull(volFlow);
         MassFlow massFlow = FlowEquations.volFlowToMassFlow(liquidWater.getDensity(), volFlow);
         return new FlowOfLiquidWater(liquidWater, massFlow);
     }
 
     public static FlowOfLiquidWater zeroFlow(Temperature temperature) {
-        Validators.requireNotNull(temperature);
+        CommonValidators.requireNotNull(temperature);
         LiquidWater liquidWater = LiquidWater.of(temperature);
         return new FlowOfLiquidWater(liquidWater, MassFlow.ofKilogramsPerSecond(0));
     }

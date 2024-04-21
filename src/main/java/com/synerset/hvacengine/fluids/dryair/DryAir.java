@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.dryair;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Fluid;
 import com.synerset.hvacengine.fluids.SharedEquations;
 import com.synerset.unitility.unitsystem.dimensionless.PrandtlNumber;
@@ -35,10 +35,10 @@ public class DryAir implements Fluid {
      * @param temperature The temperature of dry air in degrees Celsius (°C).
      */
     public DryAir(Pressure pressure, Temperature temperature) {
-        Validators.requireNotNull(pressure);
-        Validators.requireNotNull(temperature);
-        Validators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
-        Validators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
+        CommonValidators.requireNotNull(pressure);
+        CommonValidators.requireNotNull(temperature);
+        CommonValidators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
+        CommonValidators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
         this.temperature = temperature;
         this.pressure = pressure;
         this.density = DryAirEquations.density(temperature, pressure);

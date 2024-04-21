@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
@@ -28,9 +28,9 @@ public class CoolingFromTemperatureNode implements ProcessNode {
                                       InputConnector<CoolantData> coolantDataConnector,
                                       InputConnector<Temperature> targetTemperatureConnector) {
 
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(coolantDataConnector);
-        Validators.requireNotNull(targetTemperatureConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(coolantDataConnector);
+        CommonValidators.requireNotNull(targetTemperatureConnector);
         this.targetTemperatureConnector = targetTemperatureConnector;
         this.inputAirFlowConnector = inputAirFlowConnector;
         this.coolantDataInputConnector = coolantDataConnector;
@@ -108,7 +108,7 @@ public class CoolingFromTemperatureNode implements ProcessNode {
     }
 
     public void setTargetTemperature(Temperature targetTemperature) {
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(targetTemperature);
         targetTemperatureConnector.setConnectorData(targetTemperature);
     }
 
@@ -116,9 +116,9 @@ public class CoolingFromTemperatureNode implements ProcessNode {
                                                 CoolantData coolantData,
                                                 Temperature targetTemperature) {
 
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(targetTemperature);
 
 
         return new CoolingFromTemperatureNode(
@@ -133,9 +133,9 @@ public class CoolingFromTemperatureNode implements ProcessNode {
                                                 InputConnector<CoolantData> coolantData,
                                                 InputConnector<Temperature> targetTemperature) {
 
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(targetTemperature);
 
         return new CoolingFromTemperatureNode(inletAirFlow, coolantData, targetTemperature);
     }
@@ -143,8 +143,8 @@ public class CoolingFromTemperatureNode implements ProcessNode {
     public static CoolingFromTemperatureNode of(CoolantData coolantData,
                                                 Temperature targetTemperature) {
 
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(targetTemperature);
 
         return new CoolingFromTemperatureNode(
                 InputConnector.createEmpty(FlowOfHumidAir.class),

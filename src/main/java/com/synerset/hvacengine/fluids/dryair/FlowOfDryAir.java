@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.dryair;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Flow;
 import com.synerset.hvacengine.fluids.FlowEquations;
 import com.synerset.hvacengine.utils.Defaults;
@@ -28,9 +28,9 @@ public class FlowOfDryAir implements Flow<DryAir> {
      * @param massFlow The mass flow rate of dry air in appropriate units.
      */
     public FlowOfDryAir(DryAir dryAir, MassFlow massFlow) {
-        Validators.requireNotNull(dryAir);
-        Validators.requireNotNull(massFlow);
-        Validators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireNotNull(dryAir);
+        CommonValidators.requireNotNull(massFlow);
+        CommonValidators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         this.dryAir = dryAir;
         this.massFlow = massFlow;
         this.volFlow = FlowEquations.massFlowToVolFlow(dryAir.getDensity(), massFlow).toCubicMetersPerHour();
@@ -165,7 +165,7 @@ public class FlowOfDryAir implements Flow<DryAir> {
      * @return A new `FlowOfDryAir` instance.
      */
     public static FlowOfDryAir of(DryAir dryAir, VolumetricFlow volFlow) {
-        Validators.requireNotNull(volFlow);
+        CommonValidators.requireNotNull(volFlow);
         MassFlow massFlow = FlowEquations.volFlowToMassFlow(dryAir.getDensity(), volFlow);
         return new FlowOfDryAir(dryAir, massFlow);
     }

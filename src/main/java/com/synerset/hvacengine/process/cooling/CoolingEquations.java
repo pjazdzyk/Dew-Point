@@ -1,8 +1,7 @@
 package com.synerset.hvacengine.process.cooling;
 
 import com.synerset.brentsolver.BrentSolver;
-import com.synerset.hvacengine.common.Validators;
-import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
+import com.synerset.hvacengine.exception.HvacEngineArgumentException;
 import com.synerset.hvacengine.fluids.dryair.FlowOfDryAir;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.humidair.HumidAir;
@@ -22,6 +21,11 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
 import com.synerset.unitility.unitsystem.thermodynamic.SpecificHeat;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
+import static com.synerset.hvacengine.common.CommonValidators.requireAboveLowerBound;
+import static com.synerset.hvacengine.common.CommonValidators.requireBetweenBoundsInclusive;
+import static com.synerset.hvacengine.common.CommonValidators.requireNotNull;
+import static com.synerset.hvacengine.process.cooling.CoolingValidators.*;
+
 public class CoolingEquations {
 
     private CoolingEquations() {
@@ -36,10 +40,12 @@ public class CoolingEquations {
      * @return the result of dry cooling process
      */
     public static DryCoolingResult dryCoolingFromPower(FlowOfHumidAir inletAirFlow, Power inputPower) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(inputPower);
+        requireNotNull(inletAirFlow);
+        requireNotNull(inputPower);
+        requireValidInputPowerForCooling(inputPower);
+        requirePhysicalInputPowerForCooling(inletAirFlow, inputPower);
 
-        if (inputPower.isEqualZero() || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero()) {
             return DryCoolingResult.builder()
                     .processMode(ProcessMode.FROM_POWER)
                     .inletAirFlow(inletAirFlow)
@@ -70,26 +76,16 @@ public class CoolingEquations {
     /**
      * Calculates dry cooling process from target temperature.
      *
-     * @param inletAirFlow     the initial flow of humid air
+     * @param inletAirFlow      the initial flow of humid air
      * @param targetTemperature the target temperature for cooling
      * @return the result of dry cooling process
      */
     public static DryCoolingResult dryCoolingFromTemperature(FlowOfHumidAir inletAirFlow, Temperature targetTemperature) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(targetTemperature);
+        requireNotNull(inletAirFlow);
+        requireNotNull(targetTemperature);
+        requireValidTargetTemperatureForDryCooling(inletAirFlow, targetTemperature);
 
-        // The Target temperature must be lower than inlet temperature for a valid cooling case.
-        if (targetTemperature.isEqualOrGreaterThan(inletAirFlow.getTemperature()) || inletAirFlow.getMassFlow().isEqualZero()) {
-            return DryCoolingResult.builder()
-                    .processMode(ProcessMode.FROM_TEMPERATURE)
-                    .inletAirFlow(inletAirFlow)
-                    .outletAirFlow(inletAirFlow)
-                    .heatOfProcess(Power.ofWatts(0))
-                    .build();
-        }
-
-        // If the target temperature is below dew point temperature, it is certain that this is no longer dry cooling
-        if (targetTemperature.isLowerThan(inletAirFlow.getFluid().getDewPointTemperature())) {
+        if (inletAirFlow.getMassFlow().isEqualZero()) {
             return DryCoolingResult.builder()
                     .processMode(ProcessMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
@@ -128,25 +124,13 @@ public class CoolingEquations {
      * @param inputPower       cooling {@link Power}
      */
     public static RealCoolingResult coolingFromPower(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, Power inputPower) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(inletCoolantData);
-        Validators.requireNotNull(inputPower);
+        requireNotNull(inletAirFlow);
+        requireNotNull(inletCoolantData);
+        requireNotNull(inputPower);
+        requireValidInputPowerForCooling(inputPower);
+        requirePhysicalInputPowerForCooling(inletAirFlow, inputPower);
 
-        if (inputPower.isPositive()) {
-            throw new HvacEngineArgumentException("Cooling power must be negative value. Q_in = " + inputPower);
-        }
-
-        // Mox cooling power quick estimate to reach 0 degrees Qcool.max= G * (i_0 - i_in)
-        double estimatedMaxPowerKw = inletAirFlow.getSpecificEnthalpy().toKiloJoulePerKiloGram()
-                .minusFromValue(0)
-                .multiply(inletAirFlow.getMassFlow().toKilogramsPerSecond());
-        Power estimatedPowerLimit = Power.ofKiloWatts(estimatedMaxPowerKw);
-        if (inputPower.isLowerThan(estimatedPowerLimit)) {
-            throw new HvacEngineArgumentException("To large cooling power for provided flow. "
-                                                  + "Q_in = " + inputPower + " Q_limit = " + estimatedPowerLimit);
-        }
-
-        if (inputPower.isEqualZero() || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero()) {
             LiquidWater condensate = LiquidWater.of(inletAirFlow.getTemperature());
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(inletCoolantData.getAverageTemperature(), inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
@@ -189,14 +173,11 @@ public class CoolingEquations {
      * @param targetTemperature target outlet {@link Temperature}
      */
     public static RealCoolingResult coolingFromTargetTemperature(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, Temperature targetTemperature) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(inletCoolantData);
-        Validators.requireNotNull(targetTemperature);
-        Validators.requireAboveLowerBound(targetTemperature, Temperature.ofCelsius(0));
-        if (targetTemperature.isGreaterThan(inletAirFlow.getTemperature())) {
-            throw new HvacEngineArgumentException("Expected outlet temperature must be lower than inlet for cooling process. "
-                                                  + "DBT_in = " + inletAirFlow.getRelativeHumidity() + " DBT_target = " + inletAirFlow.getTemperature());
-        }
+        requireNotNull(inletAirFlow);
+        requireNotNull(inletCoolantData);
+        requireNotNull(targetTemperature);
+        requireAboveLowerBound(targetTemperature, Temperature.ofCelsius(0));
+        requireValidTargetTemperatureForCooling(inletAirFlow.getTemperature(), targetTemperature);
 
         // Determining Bypass Factor and direct near-wall contact airflow and bypassing airflow
         HumidAir inletHumidAir = inletAirFlow.getFluid();
@@ -286,14 +267,12 @@ public class CoolingEquations {
      * @param targetRelativeHumidity expected outlet {@link RelativeHumidity}
      */
     public static RealCoolingResult coolingFromTargetRelativeHumidity(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, RelativeHumidity targetRelativeHumidity) {
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(inletCoolantData);
-        Validators.requireNotNull(targetRelativeHumidity);
-        Validators.requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(98));
-        if (targetRelativeHumidity.isLowerThan(inletAirFlow.getRelativeHumidity())) {
-            throw new HvacEngineArgumentException("Cooling process cannot decrease relative humidity. "
-                                                  + "RH_in = " + inletAirFlow.getRelativeHumidity() + " RH_target = " + targetRelativeHumidity);
-        }
+        requireNotNull(inletAirFlow);
+        requireNotNull(inletCoolantData);
+        requireNotNull(targetRelativeHumidity);
+        int stableSafeLimitOfHR = 98;
+        requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(stableSafeLimitOfHR));
+        requireValidTargetRelativeHumidityForCooling(inletAirFlow.getRelativeHumidity(), targetRelativeHumidity);
 
         double pIn = inletAirFlow.getPressure().getInPascals();
 

@@ -2,6 +2,7 @@ package com.synerset.hvacengine.process.computation;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ProcessResult;
+import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.cooling.CoolantData;
 import com.synerset.hvacengine.process.cooling.CoolingFromTemperatureNode;
 import com.synerset.hvacengine.process.heating.HeatingFromHumidityNode;
@@ -39,7 +40,8 @@ class SequentialProcessingEngineTest {
         HeatingFromHumidityNode heatingNode = HeatingFromHumidityNode.of(targetRH);
 
         // When
-        SequentialProcessingEngine processComputation = SequentialProcessingEngine.of(mixingNode, coolingNode, heatingNode);
+        SequentialProcessingEngine processComputation = SequentialProcessingEngine.of(mixingNode, coolingNode);
+        int processPosition = processComputation.addProcessNode(heatingNode);
         ProcessResult lastResult = processComputation.runCalculationsForAllNodes();
         List<ProcessResult> allResults = processComputation.getAllResults();
 
@@ -54,6 +56,9 @@ class SequentialProcessingEngineTest {
         assertThat(outletAirFlow.getRelativeHumidity().getValue()).isEqualTo(30, withPrecision(1E-11));
         assertThat(processComputation.toConsoleOutputAllResults()).contains("MIXING","COOLING","HEATING");
         assertThat(processComputation.toConsoleOutputLastResult()).contains("HEATING");
+        assertThat(processPosition).isEqualTo(2);
+        assertThat(processComputation.getResultsOfType(ProcessType.HEATING).get(0)).isEqualTo(processComputation.getAllResults().get(processPosition));
+        assertThat(SequentialProcessingEngine.createEmpty()).isNotNull().isInstanceOf(SequentialProcessingEngine.class);
     }
 
 }

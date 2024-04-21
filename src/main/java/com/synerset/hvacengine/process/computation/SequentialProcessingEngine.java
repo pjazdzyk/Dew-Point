@@ -2,6 +2,7 @@ package com.synerset.hvacengine.process.computation;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ProcessResult;
+import com.synerset.hvacengine.process.ProcessType;
 
 import java.util.*;
 
@@ -45,6 +46,10 @@ public class SequentialProcessingEngine {
 
     public List<ProcessResult> getAllResults() {
         return Collections.unmodifiableList(results);
+    }
+
+    public List<ProcessResult> getResultsOfType(ProcessType processType){
+        return results.stream().filter(result -> result.processType() == processType).toList();
     }
 
     public List<ProcessNode> getAllProcessNodes() {

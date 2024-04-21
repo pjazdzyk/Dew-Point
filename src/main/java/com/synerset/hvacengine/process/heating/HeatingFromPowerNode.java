@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.process.heating;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
@@ -17,8 +17,8 @@ public class HeatingFromPowerNode implements ProcessNode {
     private HeatingResult heatingResult;
 
     public HeatingFromPowerNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector, InputConnector<Power> inputHeatConnector) {
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(inputHeatConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(inputHeatConnector);
         this.inputAirFlowConnector = inputAirFlowConnector;
         this.inputHeatConnector = inputHeatConnector;
         this.outputAirFlowConnector = OutputConnector.of(inputAirFlowConnector.getConnectorData());
@@ -70,7 +70,7 @@ public class HeatingFromPowerNode implements ProcessNode {
     }
 
     public static HeatingFromPowerNode of(FlowOfHumidAir inputAirFlow, Power inputPower) {
-        Validators.requireNotNull(inputAirFlow);
+        CommonValidators.requireNotNull(inputAirFlow);
         if (inputPower == null) {
             inputPower = Power.ofWatts(0);
         }
@@ -78,13 +78,13 @@ public class HeatingFromPowerNode implements ProcessNode {
     }
 
     public static HeatingFromPowerNode of(InputConnector<FlowOfHumidAir> inputAirFlowConnector, InputConnector<Power> heatConnector) {
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(heatConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(heatConnector);
         return new HeatingFromPowerNode(inputAirFlowConnector, heatConnector);
     }
 
     public static HeatingFromPowerNode of(InputConnector<Power> heatConnector) {
-        Validators.requireNotNull(heatConnector);
+        CommonValidators.requireNotNull(heatConnector);
         return new HeatingFromPowerNode(InputConnector.createEmpty(FlowOfHumidAir.class), heatConnector);
     }
 

@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
@@ -26,9 +26,9 @@ public class CoolingFromPowerNode implements ProcessNode {
                                 InputConnector<CoolantData> coolantDataConnector,
                                 InputConnector<Power> heatConnector) {
 
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(coolantDataConnector);
-        Validators.requireNotNull(heatConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(coolantDataConnector);
+        CommonValidators.requireNotNull(heatConnector);
         this.inputAirFlowConnector = inputAirFlowConnector;
         this.coolantDataInputConnector = coolantDataConnector;
         this.heatConnector = heatConnector;
@@ -114,8 +114,8 @@ public class CoolingFromPowerNode implements ProcessNode {
                                           CoolantData coolantData,
                                           Power coolingPower) {
 
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(coolantData);
 
         if (coolingPower == null) {
             coolingPower = Power.ofWatts(0);
@@ -133,9 +133,9 @@ public class CoolingFromPowerNode implements ProcessNode {
                                           InputConnector<CoolantData> coolantData,
                                           InputConnector<Power> coolingPower) {
 
-        Validators.requireNotNull(inletAirFlow);
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(coolingPower);
+        CommonValidators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(coolingPower);
 
         return new CoolingFromPowerNode(inletAirFlow, coolantData, coolingPower);
     }
@@ -143,8 +143,8 @@ public class CoolingFromPowerNode implements ProcessNode {
     public static CoolingFromPowerNode of(CoolantData coolantData,
                                           Power coolingPower) {
 
-        Validators.requireNotNull(coolantData);
-        Validators.requireNotNull(coolingPower);
+        CommonValidators.requireNotNull(coolantData);
+        CommonValidators.requireNotNull(coolingPower);
 
         return new CoolingFromPowerNode(
                 InputConnector.createEmpty(FlowOfHumidAir.class),

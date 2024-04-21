@@ -1,7 +1,7 @@
 package com.synerset.hvacengine.common;
 
-import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
-import com.synerset.hvacengine.common.exception.HvacEngineMissingArgumentException;
+import com.synerset.hvacengine.exception.HvacEngineArgumentException;
+import com.synerset.hvacengine.exception.HvacEngineMissingArgumentException;
 import com.synerset.hvacengine.solids.ice.Ice;
 import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;

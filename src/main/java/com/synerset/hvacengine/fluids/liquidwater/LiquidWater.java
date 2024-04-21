@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.liquidwater;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Fluid;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 
@@ -30,11 +30,11 @@ public class LiquidWater implements Fluid {
      * @throws IllegalArgumentException If either pressure or temperature is null or if the values are out of bounds.
      */
     public LiquidWater(Pressure pressure, Temperature temperature) {
-        Validators.requireNotNull(pressure);
-        Validators.requireNotNull(temperature);
-        Validators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
-        Validators.requireAboveLowerBound(temperature, TEMPERATURE_MIN_LIMIT);
-        Validators.requireBelowUpperBoundInclusive(temperature, TEMPERATURE_MAX_LIMIT);
+        CommonValidators.requireNotNull(pressure);
+        CommonValidators.requireNotNull(temperature);
+        CommonValidators.requireAboveLowerBound(pressure, PRESSURE_MIN_LIMIT);
+        CommonValidators.requireAboveLowerBound(temperature, TEMPERATURE_MIN_LIMIT);
+        CommonValidators.requireBelowUpperBoundInclusive(temperature, TEMPERATURE_MAX_LIMIT);
         this.temperature = temperature;
         this.pressure = pressure;
         this.density = LiquidWaterEquations.density(temperature);

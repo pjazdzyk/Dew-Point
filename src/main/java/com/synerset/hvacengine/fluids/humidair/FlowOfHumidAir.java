@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.fluids.humidair;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.Flow;
 import com.synerset.hvacengine.fluids.FlowEquations;
 import com.synerset.hvacengine.fluids.dryair.DryAir;
@@ -33,9 +33,9 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
      * @param massFlowHa The mass flow rate of humid air in appropriate units.
      */
     public FlowOfHumidAir(HumidAir humidAir, MassFlow massFlowHa) {
-        Validators.requireNotNull(humidAir);
-        Validators.requireNotNull(massFlowHa);
-        Validators.requireBetweenBoundsInclusive(massFlowHa, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireNotNull(humidAir);
+        CommonValidators.requireNotNull(massFlowHa);
+        CommonValidators.requireBetweenBoundsInclusive(massFlowHa, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         this.humidAir = humidAir;
         this.massFlow = massFlowHa;
         this.volFlow = FlowEquations.massFlowToVolFlow(humidAir.getDensity(), massFlowHa).toCubicMetersPerHour();
@@ -204,8 +204,8 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
      * @return A new `FlowOfHumidAir` instance.
      */
     public static FlowOfHumidAir of(HumidAir humidAir, VolumetricFlow volFlowHa) {
-        Validators.requireNotNull(humidAir);
-        Validators.requireNotNull(volFlowHa);
+        CommonValidators.requireNotNull(humidAir);
+        CommonValidators.requireNotNull(volFlowHa);
         return new FlowOfHumidAir(humidAir, FlowEquations.volFlowToMassFlow(humidAir.getDensity(), volFlowHa));
     }
 
@@ -217,9 +217,9 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
      * @return A new `FlowOfHumidAir` instance.
      */
     public static FlowOfHumidAir ofDryAirMassFlow(HumidAir humidAir, MassFlow massFlowDa) {
-        Validators.requireNotNull(humidAir);
-        Validators.requireNotNull(massFlowDa);
-        Validators.requireBetweenBoundsInclusive(massFlowDa, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
+        CommonValidators.requireNotNull(humidAir);
+        CommonValidators.requireNotNull(massFlowDa);
+        CommonValidators.requireBetweenBoundsInclusive(massFlowDa, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         HumidityRatio humRatio = humidAir.getHumidityRatio();
         MassFlow humidAirMassFlow = FlowEquations.massFlowDaToMassFlowHa(humRatio, massFlowDa);
         return FlowOfHumidAir.of(humidAir, humidAirMassFlow);

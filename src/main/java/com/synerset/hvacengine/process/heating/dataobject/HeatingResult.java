@@ -1,9 +1,9 @@
 package com.synerset.hvacengine.process.heating.dataobject;
 
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.process.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessResult;
-import com.synerset.hvacengine.process.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 

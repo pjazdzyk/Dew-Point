@@ -1,8 +1,9 @@
 package com.synerset.hvacengine.process.mixing;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ConsoleOutputFormatters;
+import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.computation.InputConnector;
 import com.synerset.hvacengine.process.computation.OutputConnector;
 import com.synerset.hvacengine.process.computation.ProcessNode;
@@ -21,7 +22,7 @@ public class MixingNode implements ProcessNode {
     public MixingNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                       List<InputConnector<FlowOfHumidAir>> inputMixingFlowsConnectors) {
 
-        Validators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
 
         if (inputMixingFlowsConnectors == null) {
             this.mixingFlowConnectors = new ArrayList<>();
@@ -44,7 +45,21 @@ public class MixingNode implements ProcessNode {
                 .toList();
 
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
-        MixingResult mixingProcessResults = MixingEquations.mixingOfMultipleFlows(inletAirFlow, recirculationFlows);
+
+        MixingResult mixingProcessResults;
+
+        if (recirculationFlows.isEmpty()) {
+            mixingProcessResults = MixingResult.builder()
+                    .processMode(ProcessMode.SIMPLE_MIXING)
+                    .inletAirFlow(inletAirFlow)
+                    .outletAirFlow(inletAirFlow)
+                    .recirculationFlows(List.of())
+                    .build();
+        } else if (recirculationFlows.size() == 1) {
+            mixingProcessResults = MixingEquations.mixingOfTwoAirFlows(inletAirFlow, recirculationFlows.get(0));
+        } else {
+            mixingProcessResults = MixingEquations.mixingOfMultipleFlows(inletAirFlow, recirculationFlows);
+        }
 
         outputAirFlowConnector.setConnectorData(mixingProcessResults.outletAirFlow());
         this.mixingResult = mixingProcessResults;
@@ -102,7 +117,7 @@ public class MixingNode implements ProcessNode {
 
     public static MixingNode of(FlowOfHumidAir inletAirFlow, Collection<FlowOfHumidAir> inputMixingFlows) {
 
-        Validators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(inletAirFlow);
 
         if (inputMixingFlows == null || inputMixingFlows.isEmpty()) {
             inputMixingFlows = new ArrayList<>();
@@ -131,7 +146,7 @@ public class MixingNode implements ProcessNode {
 
     public static MixingNode of(FlowOfHumidAir inletAirFlow, FlowOfHumidAir recirculationAirFlow) {
 
-        Validators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(inletAirFlow);
 
         ArrayList<InputConnector<FlowOfHumidAir>> inputMixingConnector = new ArrayList<>();
 
@@ -145,7 +160,7 @@ public class MixingNode implements ProcessNode {
     public static MixingNode of(InputConnector<FlowOfHumidAir> inletAirFlow,
                                 List<InputConnector<FlowOfHumidAir>> mixingFlowConnectors) {
 
-        Validators.requireNotNull(inletAirFlow);
+        CommonValidators.requireNotNull(inletAirFlow);
         if (mixingFlowConnectors == null || mixingFlowConnectors.isEmpty()) {
             mixingFlowConnectors = new ArrayList<>();
         }

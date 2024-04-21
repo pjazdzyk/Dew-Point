@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.process.heating;
 
-import com.synerset.hvacengine.common.Validators;
+import com.synerset.hvacengine.common.CommonValidators;
 import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ConsoleOutputFormatters;
 import com.synerset.hvacengine.process.computation.InputConnector;
@@ -21,8 +21,8 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     public HeatingFromTemperatureNode(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                       InputConnector<Temperature> targetTemperatureConnector) {
 
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(targetTemperatureConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(targetTemperatureConnector);
         this.inputAirFlowConnector = inputAirFlowConnector;
         this.outputAirFlowConnector = OutputConnector.of(inputAirFlowConnector.getConnectorData());
         this.outputHeatConnector = OutputConnector.createEmpty(Power.class);
@@ -62,7 +62,7 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     }
 
     public void setTargetTemperature(Temperature targetTemperature) {
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(targetTemperature);
         this.targetTemperatureConnector.setConnectorData(targetTemperature);
     }
 
@@ -71,7 +71,7 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     }
 
     public void setTargetTemperatureConnector(InputConnector<Temperature> targetTemperatureConnector) {
-        Validators.requireNotNull(targetTemperatureConnector);
+        CommonValidators.requireNotNull(targetTemperatureConnector);
         this.targetTemperatureConnector = targetTemperatureConnector;
     }
 
@@ -83,8 +83,8 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     }
 
     public static HeatingFromTemperatureNode of(FlowOfHumidAir inputAirFlow, Temperature targetTemperature) {
-        Validators.requireNotNull(inputAirFlow);
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(inputAirFlow);
+        CommonValidators.requireNotNull(targetTemperature);
         return new HeatingFromTemperatureNode(
                 InputConnector.of(inputAirFlow),
                 InputConnector.of(targetTemperature)
@@ -94,13 +94,13 @@ public class HeatingFromTemperatureNode implements ProcessNode {
     public static HeatingFromTemperatureNode of(InputConnector<FlowOfHumidAir> inputAirFlowConnector,
                                                 InputConnector<Temperature> targetTemperatureConnector) {
 
-        Validators.requireNotNull(inputAirFlowConnector);
-        Validators.requireNotNull(targetTemperatureConnector);
+        CommonValidators.requireNotNull(inputAirFlowConnector);
+        CommonValidators.requireNotNull(targetTemperatureConnector);
         return new HeatingFromTemperatureNode(inputAirFlowConnector, targetTemperatureConnector);
     }
 
     public static HeatingFromTemperatureNode of(Temperature targetTemperature) {
-        Validators.requireNotNull(targetTemperature);
+        CommonValidators.requireNotNull(targetTemperature);
         return new HeatingFromTemperatureNode(
                 InputConnector.createEmpty(FlowOfHumidAir.class),
                 InputConnector.of(targetTemperature)
