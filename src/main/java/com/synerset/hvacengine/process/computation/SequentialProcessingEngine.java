@@ -1,14 +1,15 @@
 package com.synerset.hvacengine.process.computation;
 
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.process.ProcessBlock;
 import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.ProcessType;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 
 import java.util.*;
 
 public class SequentialProcessingEngine {
 
-    private final List<ProcessNode> nodes;
+    private final List<ProcessBlock> nodes;
     private final List<ProcessResult> results;
     private FlowOfHumidAir inletAirFlow;
 
@@ -17,12 +18,12 @@ public class SequentialProcessingEngine {
         this.nodes = new ArrayList<>();
     }
 
-    public int addProcessNode(ProcessNode processNode) {
+    public int addProcessNode(ProcessBlock processNode) {
         if (processNode == null) {
             return -1;
         }
         if (!nodes.isEmpty()) {
-            ProcessNode previousNode = nodes.get(nodes.size() - 1);
+            ProcessBlock previousNode = nodes.get(nodes.size() - 1);
             processNode.getAirFlowInputConnector().connectToOutputConnector(previousNode.getAirFlowOutputConnector());
         }
         nodes.add(processNode);
@@ -52,7 +53,7 @@ public class SequentialProcessingEngine {
         return results.stream().filter(result -> result.processType() == processType).toList();
     }
 
-    public List<ProcessNode> getAllProcessNodes() {
+    public List<ProcessBlock> getAllProcessNodes() {
         return Collections.unmodifiableList(nodes);
     }
 
@@ -89,7 +90,7 @@ public class SequentialProcessingEngine {
         return sequentialProcessingEngine;
     }
 
-    public static SequentialProcessingEngine of(ProcessNode... processNodes) {
+    public static SequentialProcessingEngine of(ProcessBlock... processNodes) {
         SequentialProcessingEngine sequentialProcessingEngine = new SequentialProcessingEngine();
         Arrays.stream(processNodes).forEach(sequentialProcessingEngine::addProcessNode);
         return sequentialProcessingEngine;

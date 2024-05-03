@@ -1,11 +1,11 @@
 package com.synerset.hvacengine.process.heating;
 
-import com.synerset.hvacengine.common.CommonValidators;
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
+import com.synerset.hvacengine.common.validation.CommonValidators;
 import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;

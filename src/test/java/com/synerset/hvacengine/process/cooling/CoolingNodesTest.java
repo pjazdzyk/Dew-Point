@@ -1,13 +1,13 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
-import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
-import com.synerset.hvacengine.fluids.liquidwater.LiquidWaterEquations;
 import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
+import com.synerset.hvacengine.property.fluids.liquidwater.FlowOfLiquidWater;
+import com.synerset.hvacengine.property.fluids.liquidwater.LiquidWaterEquations;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -47,7 +47,7 @@ class CoolingNodesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.010444945743262712);
 
         // When
-        CoolingFromTemperatureNode coolingNode = CoolingFromTemperatureNode.of(TEST_INLET_AIR_FLOW, coolantData, targetTemperature);
+        CoolingFromTemperatureBlock coolingNode = CoolingFromTemperatureBlock.of(TEST_INLET_AIR_FLOW, coolantData, targetTemperature);
         CoolingNodeResult processResults = coolingNode.runProcessCalculations();
 
         // Then
@@ -90,7 +90,7 @@ class CoolingNodesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.010444945743262712);
 
         // When
-        CoolingFromPowerNode coolingFromPowerNode = CoolingFromPowerNode.of(TEST_INLET_AIR_FLOW, coolantData, inputPower);
+        CoolingFromPowerBlock coolingFromPowerNode = CoolingFromPowerBlock.of(TEST_INLET_AIR_FLOW, coolantData, inputPower);
         CoolingNodeResult processResults = coolingFromPowerNode.runProcessCalculations();
 
         // Then
@@ -131,7 +131,7 @@ class CoolingNodesTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.010444945743501704);
 
         // When
-        CoolingFromHumidityNode coolingFromHumidityNode = CoolingFromHumidityNode.of(TEST_INLET_AIR_FLOW, coolantData, targetRH);
+        CoolingFromHumidityBlock coolingFromHumidityNode = CoolingFromHumidityBlock.of(TEST_INLET_AIR_FLOW, coolantData, targetRH);
         CoolingNodeResult processResults = coolingFromHumidityNode.runProcessCalculations();
         assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
 

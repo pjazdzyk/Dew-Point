@@ -1,7 +1,7 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.exception.HvacEngineArgumentException;
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;

@@ -1,13 +1,13 @@
 package com.synerset.hvacengine.process;
 
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.hvacengine.process.cooling.CoolantData;
 import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.property.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.flow.VolumetricFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;

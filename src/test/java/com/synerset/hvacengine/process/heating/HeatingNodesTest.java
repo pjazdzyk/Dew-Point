@@ -1,11 +1,11 @@
 package com.synerset.hvacengine.process.heating;
 
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
 import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
@@ -42,7 +42,7 @@ class HeatingNodesTest {
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(17.4);
 
         // When
-        HeatingFromPowerNode heatingFromPowerNode = HeatingFromPowerNode.of(TEST_INLET_FLOW, inputPower);
+        HeatingFromPowerBlock heatingFromPowerNode = HeatingFromPowerBlock.of(TEST_INLET_FLOW, inputPower);
         HeatingResult processResults = heatingFromPowerNode.runProcessCalculations();
 
         // Then
@@ -71,7 +71,7 @@ class HeatingNodesTest {
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(17.386707253107);
 
         // When
-        HeatingFromTemperatureNode heatingFromTemperatureNode = HeatingFromTemperatureNode.of(TEST_INLET_FLOW, targetTemperature);
+        HeatingFromTemperatureBlock heatingFromTemperatureNode = HeatingFromTemperatureBlock.of(TEST_INLET_FLOW, targetTemperature);
         HeatingResult processResults = heatingFromTemperatureNode.runProcessCalculations();
 
         // Then
@@ -101,7 +101,7 @@ class HeatingNodesTest {
         Temperature expectedTemperature = Temperature.ofCelsius(29.96581041061914);
 
         // When
-        HeatingFromHumidityNode heatingFromHumidityNode = HeatingFromHumidityNode.of(TEST_INLET_FLOW, targetRH);
+        HeatingFromHumidityBlock heatingFromHumidityNode = HeatingFromHumidityBlock.of(TEST_INLET_FLOW, targetRH);
         HeatingResult processResults = heatingFromHumidityNode.runProcessCalculations();
 
         // Then

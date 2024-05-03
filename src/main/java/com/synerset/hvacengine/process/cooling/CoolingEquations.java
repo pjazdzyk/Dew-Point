@@ -1,18 +1,18 @@
 package com.synerset.hvacengine.process.cooling;
 
 import com.synerset.brentsolver.BrentSolver;
-import com.synerset.hvacengine.exception.HvacEngineArgumentException;
-import com.synerset.hvacengine.fluids.dryair.FlowOfDryAir;
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAirEquations;
-import com.synerset.hvacengine.fluids.liquidwater.FlowOfLiquidWater;
-import com.synerset.hvacengine.fluids.liquidwater.LiquidWater;
-import com.synerset.hvacengine.fluids.liquidwater.LiquidWaterEquations;
+import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
 import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
+import com.synerset.hvacengine.property.fluids.dryair.FlowOfDryAir;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
+import com.synerset.hvacengine.property.fluids.liquidwater.FlowOfLiquidWater;
+import com.synerset.hvacengine.property.fluids.liquidwater.LiquidWater;
+import com.synerset.hvacengine.property.fluids.liquidwater.LiquidWaterEquations;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
@@ -21,9 +21,9 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
 import com.synerset.unitility.unitsystem.thermodynamic.SpecificHeat;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
-import static com.synerset.hvacengine.common.CommonValidators.requireAboveLowerBound;
-import static com.synerset.hvacengine.common.CommonValidators.requireBetweenBoundsInclusive;
-import static com.synerset.hvacengine.common.CommonValidators.requireNotNull;
+import static com.synerset.hvacengine.common.validation.CommonValidators.requireAboveLowerBound;
+import static com.synerset.hvacengine.common.validation.CommonValidators.requireBetweenBoundsInclusive;
+import static com.synerset.hvacengine.common.validation.CommonValidators.requireNotNull;
 import static com.synerset.hvacengine.process.cooling.CoolingValidators.*;
 
 public class CoolingEquations {

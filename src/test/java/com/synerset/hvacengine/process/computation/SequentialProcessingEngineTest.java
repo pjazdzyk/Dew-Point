@@ -1,12 +1,12 @@
 package com.synerset.hvacengine.process.computation;
 
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.cooling.CoolantData;
-import com.synerset.hvacengine.process.cooling.CoolingFromTemperatureNode;
-import com.synerset.hvacengine.process.heating.HeatingFromHumidityNode;
-import com.synerset.hvacengine.process.mixing.MixingNode;
+import com.synerset.hvacengine.process.cooling.CoolingFromTemperatureBlock;
+import com.synerset.hvacengine.process.heating.HeatingFromHumidityBlock;
+import com.synerset.hvacengine.process.mixing.MixingBlock;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 import org.junit.jupiter.api.Test;
@@ -35,9 +35,9 @@ class SequentialProcessingEngineTest {
         CoolantData coolantData = CoolantData.ofValues(7, 14);
         RelativeHumidity targetRH = RelativeHumidity.ofPercentage(30);
 
-        MixingNode mixingNode = MixingNode.of(inletFlow, recirculationAir);
-        CoolingFromTemperatureNode coolingNode = CoolingFromTemperatureNode.of(coolantData, targetCoolingTemperature);
-        HeatingFromHumidityNode heatingNode = HeatingFromHumidityNode.of(targetRH);
+        MixingBlock mixingNode = MixingBlock.of(inletFlow, recirculationAir);
+        CoolingFromTemperatureBlock coolingNode = CoolingFromTemperatureBlock.of(coolantData, targetCoolingTemperature);
+        HeatingFromHumidityBlock heatingNode = HeatingFromHumidityBlock.of(targetRH);
 
         // When
         SequentialProcessingEngine processComputation = SequentialProcessingEngine.of(mixingNode, coolingNode);

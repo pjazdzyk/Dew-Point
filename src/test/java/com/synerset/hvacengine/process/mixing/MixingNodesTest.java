@@ -1,10 +1,10 @@
 package com.synerset.hvacengine.process.mixing;
 
-import com.synerset.hvacengine.fluids.humidair.FlowOfHumidAir;
-import com.synerset.hvacengine.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
+import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -52,7 +52,7 @@ class MixingNodesTest {
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(36.29);
 
         // When
-        MixingNode mixingNode = MixingNode.of(inletFlow, recirculationFlow);
+        MixingBlock mixingNode = MixingBlock.of(inletFlow, recirculationFlow);
         MixingResult processResults = mixingNode.runProcessCalculations();
         List<FlowOfHumidAir> actualMixingFlows = mixingNode.getMixingFlows();
 
@@ -116,7 +116,7 @@ class MixingNodesTest {
                 .toKiloGramPerHour();
 
         // When
-        MixingNode mixingNode = MixingNode.of(inletFlow, List.of(recirculationFlow1, recirculationFlow2));
+        MixingBlock mixingNode = MixingBlock.of(inletFlow, List.of(recirculationFlow1, recirculationFlow2));
         MixingResult processResults = mixingNode.runProcessCalculations();
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
         assertThat(processResults.processMode()).isEqualTo(ProcessMode.MULTIPLE_MIXING);
