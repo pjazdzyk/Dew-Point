@@ -1,16 +1,15 @@
 package com.synerset.hvacengine.property.solids.ice;
 
+import com.synerset.hvacengine.common.ConsolePrintable;
 import com.synerset.hvacengine.common.validation.CommonValidators;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
-import static com.synerset.hvacengine.common.Defaults.STANDARD_ATMOSPHERE;
-
 /**
  * The `Ice` class represents the properties of ice at a specific pressure and temperature.
  */
-public class Ice {
+public class Ice implements ConsolePrintable {
     public static final Pressure PRESSURE_MIN_LIMIT = Pressure.ofPascal(0);
     public static final Temperature TEMPERATURE_MIN_LIMIT = Temperature.ofCelsius(-150);
     private final Temperature temperature;
@@ -62,6 +61,7 @@ public class Ice {
      *
      * @return A formatted string representing the properties of ice.
      */
+    @Override
     public String toConsoleOutput() {
         String separator = " | ";
         String end = "\n\t";
@@ -119,7 +119,7 @@ public class Ice {
      * @return An `Ice` object at standard atmospheric pressure with the given temperature.
      */
     public static Ice of(Temperature temperature) {
-        return new Ice(STANDARD_ATMOSPHERE, temperature);
+        return new Ice(Pressure.STANDARD_ATMOSPHERE, temperature);
     }
 
 }

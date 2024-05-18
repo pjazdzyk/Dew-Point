@@ -1,4 +1,4 @@
-package com.synerset.hvacengine.common.utils;
+package com.synerset.hvacengine.common;
 
 import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
 

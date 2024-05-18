@@ -1,9 +1,9 @@
 package com.synerset.hvacengine.process.mixing.dataobject;
 
 import com.synerset.hvacengine.process.ConsoleOutputFormatters;
-import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.ProcessType;
+import com.synerset.hvacengine.process.mixing.MixingMode;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
@@ -14,7 +14,7 @@ import java.util.Collection;
  * The AirMixingResult record represents the result of a mixing process.
  */
 public record MixingResult(ProcessType processType,
-                           ProcessMode processMode,
+                           MixingMode processMode,
                            FlowOfHumidAir inletAirFlow,
                            FlowOfHumidAir outletAirFlow,
                            Power heatOfProcess,
@@ -27,7 +27,7 @@ public record MixingResult(ProcessType processType,
 
     public static class AirMixingResultBuilder {
         private static final ProcessType processType = ProcessType.MIXING;
-        private ProcessMode processMode;
+        private MixingMode processMode;
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess = Power.ofWatts(0);
@@ -37,7 +37,7 @@ public record MixingResult(ProcessType processType,
             recirculationFlows = new ArrayList<>();
         }
 
-        public AirMixingResultBuilder processMode(ProcessMode processMode) {
+        public AirMixingResultBuilder processMode(MixingMode processMode) {
             this.processMode = processMode;
             return this;
         }

@@ -1,6 +1,5 @@
 package com.synerset.hvacengine.property.fluids.humidair;
 
-import com.synerset.hvacengine.common.Defaults;
 import com.synerset.hvacengine.property.fluids.SharedEquations;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -85,7 +84,7 @@ class HumidAirTest {
     @DisplayName("should create humid air instance of the same parameters for different constructor input")
     void shouldCreateTheSameAirInstance_whenUsingDifferentConstructors() {
         // Given
-        double inputPressure = Defaults.STANDARD_ATMOSPHERE.getValue();
+        double inputPressure = Pressure.STANDARD_ATMOSPHERE.getValue();
         double inputAirTemp = 25.0;
         double inputHumidRatio = 0.0072129;
         double relativeHumidity = HumidAirEquations.relativeHumidity(inputAirTemp, inputHumidRatio, inputPressure);

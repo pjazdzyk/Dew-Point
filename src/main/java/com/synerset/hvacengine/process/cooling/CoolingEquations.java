@@ -2,10 +2,8 @@ package com.synerset.hvacengine.process.cooling;
 
 import com.synerset.brentsolver.BrentSolver;
 import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
-import com.synerset.hvacengine.process.ProcessMode;
-import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
-import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.hvacengine.property.fluids.dryair.FlowOfDryAir;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
@@ -47,7 +45,7 @@ public class CoolingEquations {
 
         if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero()) {
             return DryCoolingResult.builder()
-                    .processMode(ProcessMode.FROM_POWER)
+                    .processMode(CoolingMode.FROM_POWER)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(inputPower)
@@ -66,7 +64,7 @@ public class CoolingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, inletAirFlow.getDryAirMassFlow());
 
         return DryCoolingResult.builder()
-                .processMode(ProcessMode.FROM_POWER)
+                .processMode(CoolingMode.FROM_POWER)
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(outletFlow)
                 .heatOfProcess(inputPower)
@@ -87,7 +85,7 @@ public class CoolingEquations {
 
         if (inletAirFlow.getMassFlow().isEqualZero()) {
             return DryCoolingResult.builder()
-                    .processMode(ProcessMode.FROM_TEMPERATURE)
+                    .processMode(CoolingMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
@@ -107,7 +105,7 @@ public class CoolingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaIn));
 
         return DryCoolingResult.builder()
-                .processMode(ProcessMode.FROM_TEMPERATURE)
+                .processMode(CoolingMode.FROM_TEMPERATURE)
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(outletFlow)
                 .heatOfProcess(requiredHeat)
@@ -116,14 +114,14 @@ public class CoolingEquations {
 
     /**
      * Real cooling coil process result as a double array, for provided cooling power.
-     * Results structure: {@link CoolingNodeResult}
+     * Results structure: {@link CoolingResult}
      * REFERENCE SOURCE: [1] [Q, W] (-) [37]
      *
      * @param inletAirFlow     initial {@link FlowOfHumidAir}
      * @param inletCoolantData coolant data {@link CoolantData}
      * @param inputPower       cooling {@link Power}
      */
-    public static RealCoolingResult coolingFromPower(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, Power inputPower) {
+    public static CoolingResult coolingFromPower(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, Power inputPower) {
         requireNotNull(inletAirFlow);
         requireNotNull(inletCoolantData);
         requireNotNull(inputPower);
@@ -134,12 +132,16 @@ public class CoolingEquations {
             LiquidWater condensate = LiquidWater.of(inletAirFlow.getTemperature());
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(inletCoolantData.getAverageTemperature(), inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
-            return RealCoolingResult.builder()
-                    .processMode(ProcessMode.FROM_POWER)
+
+            return CoolingResult.builder()
+                    .processMode(CoolingMode.FROM_POWER)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(inputPower)
                     .condensateFlow(condensateFlow)
+                    .averageCoilWallTemperature(inletCoolantData.getAverageTemperature())
+                    .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getSupplyTemperature()), MassFlow.ofKilogramsPerSecond(0)))
+                    .coolantReturnFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getReturnTemperature()), MassFlow.ofKilogramsPerSecond(0)))
                     .bypassFactor(bypassFactor)
                     .build();
         }
@@ -150,29 +152,29 @@ public class CoolingEquations {
         double tmax = dryCooling.outletAirFlow().getTemperature().getInCelsius();
         BrentSolver solver = new BrentSolver("[CoolingFromPower]");
         solver.setCounterpartPoints(tmin, tmax);
-        RealCoolingResult[] coolingResults = new RealCoolingResult[1];
+        CoolingResult[] coolingResults = new CoolingResult[1];
         solver.calcForFunction(outTemp -> {
-            RealCoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(outTemp));
+            CoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(outTemp));
             coolingResults[0] = airCoolingResult;
             Power calculatedQ = airCoolingResult.heatOfProcess();
             return calculatedQ.getInWatts() - inputPower.getInWatts();
         });
 
-        return coolingResults[0].withProcessMode(ProcessMode.FROM_POWER);
+        return coolingResults[0].withProcessMode(CoolingMode.FROM_POWER);
     }
 
     /**
      * Real cooling coil process. Returns real cooling coil process result as double array, to achieve expected outlet
      * temperature. This method represents real cooling coil, where additional energy is used to discharge more condensate
      * compared to ideal coil.
-     * Results structure: {@link CoolingNodeResult}
+     * Results structure: {@link CoolingResult}
      * REFERENCE SOURCE: [1] [t2,oC] (-) [37]
      *
      * @param inletAirFlow      initial {@link FlowOfHumidAir}
      * @param inletCoolantData  average cooling coil wall {@link CoolantData}
      * @param targetTemperature target outlet {@link Temperature}
      */
-    public static RealCoolingResult coolingFromTargetTemperature(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, Temperature targetTemperature) {
+    public static CoolingResult coolingFromTargetTemperature(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, Temperature targetTemperature) {
         requireNotNull(inletAirFlow);
         requireNotNull(inletCoolantData);
         requireNotNull(targetTemperature);
@@ -190,14 +192,16 @@ public class CoolingEquations {
         Temperature averageWallTemp = inletCoolantData.getAverageTemperature();
         BypassFactor bypassFactor = coilBypassFactor(averageWallTemp, inletHumidAir.getTemperature(), targetTemperature);
         if (tOut == tIn || inletAirFlow.getMassFlow().isEqualZero()) {
-            return RealCoolingResult.builder()
-                    .processMode(ProcessMode.FROM_TEMPERATURE)
+            return CoolingResult.builder()
+                    .processMode(CoolingMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
                     .condensateFlow(condensateFlow)
                     .bypassFactor(bypassFactor)
-                    .coolantData(inletCoolantData)
+                    .averageCoilWallTemperature(inletCoolantData.getAverageTemperature())
+                    .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getSupplyTemperature()), MassFlow.ofKilogramsPerSecond(0)))
+                    .coolantReturnFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getReturnTemperature()), MassFlow.ofKilogramsPerSecond(0)))
                     .build();
         }
 
@@ -243,15 +247,24 @@ public class CoolingEquations {
         );
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, inletAirFlow.getFlowOfDryAir().getMassFlow());
+        Power resultingCoolingPower = Power.ofKiloWatts(qCool);
+        MassFlow coolantMassFlow = CoolingEquations.massFlowFromPower(
+                LiquidWater.of(inletCoolantData.getSupplyTemperature()),
+                inletCoolantData.getReturnTemperature(),
+                resultingCoolingPower
+        );
 
-        return RealCoolingResult.builder()
-                .processMode(ProcessMode.FROM_TEMPERATURE)
+        return CoolingResult.builder()
+                .processMode(CoolingMode.FROM_TEMPERATURE)
                 .inletAirFlow(inletAirFlow)
                 .outletAirFlow(outletFlow)
-                .heatOfProcess(Power.ofKiloWatts(qCool))
+                .heatOfProcess(resultingCoolingPower)
                 .condensateFlow(condensateFlow)
                 .bypassFactor(coilBypassFactor)
-                .coolantData(inletCoolantData)
+                .bypassFactor(bypassFactor)
+                .averageCoilWallTemperature(inletCoolantData.getAverageTemperature())
+                .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getSupplyTemperature()), coolantMassFlow))
+                .coolantReturnFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getReturnTemperature()), coolantMassFlow))
                 .build();
     }
 
@@ -266,7 +279,7 @@ public class CoolingEquations {
      * @param inletCoolantData       average cooling coil wall {@link CoolantData}
      * @param targetRelativeHumidity expected outlet {@link RelativeHumidity}
      */
-    public static RealCoolingResult coolingFromTargetRelativeHumidity(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, RelativeHumidity targetRelativeHumidity) {
+    public static CoolingResult coolingFromTargetRelativeHumidity(FlowOfHumidAir inletAirFlow, CoolantData inletCoolantData, RelativeHumidity targetRelativeHumidity) {
         requireNotNull(inletAirFlow);
         requireNotNull(inletCoolantData);
         requireNotNull(targetRelativeHumidity);
@@ -282,14 +295,16 @@ public class CoolingEquations {
             LiquidWater condensate = LiquidWater.of(inletAirFlow.getTemperature());
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(averageWallTemp, inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
-            return RealCoolingResult.builder()
-                    .processMode(ProcessMode.FROM_HUMIDITY)
+            return CoolingResult.builder()
+                    .processMode(CoolingMode.FROM_HUMIDITY)
                     .inletAirFlow(inletAirFlow)
                     .outletAirFlow(inletAirFlow)
                     .heatOfProcess(Power.ofWatts(0))
                     .condensateFlow(condensateFlow)
                     .bypassFactor(bypassFactor)
-                    .coolantData(inletCoolantData)
+                    .averageCoilWallTemperature(inletCoolantData.getAverageTemperature())
+                    .coolantSupplyFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getSupplyTemperature()), MassFlow.ofKilogramsPerSecond(0)))
+                    .coolantReturnFlow(FlowOfLiquidWater.of(LiquidWater.of(inletCoolantData.getReturnTemperature()), MassFlow.ofKilogramsPerSecond(0)))
                     .build();
         }
 
@@ -299,10 +314,10 @@ public class CoolingEquations {
         double tdpIn = inletAirFlow.getTemperature().getInCelsius();
         solver.setCounterpartPoints(tIn, tdpIn);
         double rhOut = targetRelativeHumidity.getInPercent();
-        RealCoolingResult[] coolingResults = new RealCoolingResult[1];
+        CoolingResult[] coolingResults = new CoolingResult[1];
 
         solver.calcForFunction(testOutTx -> {
-            RealCoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(testOutTx));
+            CoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(testOutTx));
             coolingResults[0] = airCoolingResult;
             FlowOfHumidAir outletFlow = airCoolingResult.outletAirFlow();
             double outTx = outletFlow.getTemperature().getInCelsius();
@@ -311,7 +326,7 @@ public class CoolingEquations {
             return rhOut - actualRH;
         });
 
-        return coolingResults[0].withProcessMode(ProcessMode.FROM_HUMIDITY);
+        return coolingResults[0].withProcessMode(CoolingMode.FROM_HUMIDITY);
     }
 
     // Helpers & tools

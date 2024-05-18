@@ -1,8 +1,8 @@
 package com.synerset.hvacengine.process.mixing;
 
-import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
+import com.synerset.hvacengine.process.source.SimpleDataSource;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.withPrecision;
  * B.Lipska - Projektowanie Wentylacji i Klimatyzacji, Podstawy uzdatniania powietrza. Gliwice 2014.
  * Section: 2.1, page: 37
  */
-class MixingNodesTest {
+class MixingBlockTest {
 
     @Test
     @DisplayName("Mixing node: should mix two humid air flows")
@@ -44,7 +44,10 @@ class MixingNodesTest {
         );
 
         FlowOfHumidAir inletFlow = FlowOfHumidAir.of(inletAir, MassFlow.ofKilogramsPerHour(20_000));
+        SimpleDataSource<FlowOfHumidAir> airFlowSource = SimpleDataSource.of(inletFlow);
+
         FlowOfHumidAir recirculationFlow = FlowOfHumidAir.of(recirculationAir, MassFlow.ofKilogramsPerHour(30_000));
+        SimpleDataSource<FlowOfHumidAir> mixingFlowDataSource = SimpleDataSource.of(recirculationFlow);
 
         HumidityRatio expectedHumRatio = HumidityRatio.ofKilogramPerKilogram(0.0061);
         SpecificEnthalpy expectedEnthalpy = SpecificEnthalpy.ofKiloJoulePerKiloGram(37.61);
@@ -52,9 +55,9 @@ class MixingNodesTest {
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(36.29);
 
         // When
-        MixingBlock mixingNode = MixingBlock.of(inletFlow, recirculationFlow);
-        MixingResult processResults = mixingNode.runProcessCalculations();
-        List<FlowOfHumidAir> actualMixingFlows = mixingNode.getMixingFlows();
+        Mixing mixingBlock = Mixing.of(airFlowSource, mixingFlowDataSource);
+        MixingResult processResults = mixingBlock.runProcessCalculations();
+        List<FlowOfHumidAir> actualMixingFlows = mixingBlock.getUnwrappedMixingFlows();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -63,7 +66,7 @@ class MixingNodesTest {
         assertThat(processResults.heatOfProcess()).isEqualTo(Power.ofWatts(0));
         assertThat(actualMixingFlows).hasSize(1);
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
-        assertThat(processResults.processMode()).isEqualTo(ProcessMode.SIMPLE_MIXING);
+        assertThat(processResults.processMode()).isEqualTo(MixingMode.SIMPLE_MIXING);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(inletAir.getPressure());
@@ -73,9 +76,9 @@ class MixingNodesTest {
         assertThat(outletAirFlow.getSpecificEnthalpy().getInKiloJoulesPerKiloGram()).isEqualTo(expectedEnthalpy.getInKiloJoulesPerKiloGram(), withPrecision(8E-2));
 
         // Resetting mixing flows, expecting outlet air = inlet air
-        mixingNode.resetMixingFlows();
-        mixingNode.runProcessCalculations();
-        MixingResult processResultsNoMixing = mixingNode.getProcessResults();
+        mixingBlock.resetMixingFlows();
+        mixingBlock.runProcessCalculations();
+        MixingResult processResultsNoMixing = mixingBlock.getProcessResult();
         assertThat(processResultsNoMixing.inletAirFlow()).isEqualTo(processResultsNoMixing.outletAirFlow());
     }
 
@@ -102,8 +105,12 @@ class MixingNodesTest {
         );
 
         FlowOfHumidAir inletFlow = FlowOfHumidAir.of(inletAir, MassFlow.ofKilogramsPerHour(20_000));
+        SimpleDataSource<FlowOfHumidAir> airFlowSource = SimpleDataSource.of(inletFlow);
+
         FlowOfHumidAir recirculationFlow1 = FlowOfHumidAir.of(recirculationAir1, MassFlow.ofKilogramsPerHour(30_000));
+        SimpleDataSource<FlowOfHumidAir> mixingFlowDataSource1 = SimpleDataSource.of(recirculationFlow1);
         FlowOfHumidAir recirculationFlow2 = FlowOfHumidAir.of(recirculationAir2, MassFlow.ofKilogramsPerHour(10_000));
+        SimpleDataSource<FlowOfHumidAir> mixingFlowDataSource2 = SimpleDataSource.of(recirculationFlow2);
 
         HumidityRatio expectedHumRatio = HumidityRatio.ofKilogramPerKilogram(0.005341094418842777);
         SpecificEnthalpy expectedEnthalpy = SpecificEnthalpy.ofKiloJoulePerKiloGram(30.31164274263736);
@@ -116,10 +123,10 @@ class MixingNodesTest {
                 .toKiloGramPerHour();
 
         // When
-        MixingBlock mixingNode = MixingBlock.of(inletFlow, List.of(recirculationFlow1, recirculationFlow2));
-        MixingResult processResults = mixingNode.runProcessCalculations();
+        Mixing mixingBlock = Mixing.of(airFlowSource, List.of(mixingFlowDataSource1, mixingFlowDataSource2));
+        MixingResult processResults = mixingBlock.runProcessCalculations();
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
-        assertThat(processResults.processMode()).isEqualTo(ProcessMode.MULTIPLE_MIXING);
+        assertThat(processResults.processMode()).isEqualTo(MixingMode.MULTIPLE_MIXING);
 
         // Then
         assertThat(processResults).isNotNull();
@@ -135,11 +142,19 @@ class MixingNodesTest {
         assertThat(outletAirFlow.getSpecificEnthalpy().getInKiloJoulesPerKiloGram()).isEqualTo(expectedEnthalpy.getInKiloJoulesPerKiloGram(), withPrecision(8E-2));
 
         // Adding another flow
-        mixingNode.addMixingFlow(outletAirFlow);
-        mixingNode.runProcessCalculations();
-        MixingResult processResultsNewFlow = mixingNode.getProcessResults();
+        mixingBlock.addMixingFlowDataSource(SimpleDataSource.of(outletAirFlow));
+        mixingBlock.runProcessCalculations();
+        MixingResult processResultsNewFlow = mixingBlock.getProcessResult();
 
-        assertThat(mixingNode.getMixingFlows()).hasSize(3);
+        assertThat(mixingBlock.getUnwrappedMixingFlows()).hasSize(3);
         assertThat(processResultsNewFlow.outletAirFlow().getMassFlow()).isEqualTo(sumOfAllFlows.plus(outletAirFlow.getMassFlow()));
+
+        // Changing flow in one mixing flows by 50% of dry air mass flow in first recirculation flow
+        mixingFlowDataSource1.setSourceData(recirculationFlow1.withMassFlow(MassFlow.ofKilogramsPerHour(20_0000)));
+        mixingBlock.runProcessCalculations();
+
+        assertThat(mixingBlock.getUnwrappedMixingFlows()).hasSize(3);
+        assertThat(processResultsNewFlow.outletAirFlow().getMassFlow().toKiloGramPerHour().getValue()).isEqualTo(120000, withPrecision(1E-10));
+
     }
 }

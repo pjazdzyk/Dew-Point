@@ -1,6 +1,5 @@
 package com.synerset.hvacengine.property.fluids.dryair;
 
-import com.synerset.hvacengine.common.Defaults;
 import com.synerset.hvacengine.common.validation.CommonValidators;
 import com.synerset.hvacengine.property.fluids.Flow;
 import com.synerset.hvacengine.property.fluids.FlowEquations;
@@ -194,7 +193,7 @@ public class FlowOfDryAir implements Flow<DryAir> {
      * @return A new `FlowOfDryAir` instance.
      */
     public static FlowOfDryAir ofValues(double temperature, double m3hVolFlow) {
-        double pressure = Defaults.STANDARD_ATMOSPHERE.getInPascals();
+        double pressure = Pressure.STANDARD_ATMOSPHERE.getInPascals();
         return ofValues(pressure, temperature, m3hVolFlow);
     }
 

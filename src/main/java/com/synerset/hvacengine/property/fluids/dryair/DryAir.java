@@ -8,8 +8,6 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
-import static com.synerset.hvacengine.common.Defaults.STANDARD_ATMOSPHERE;
-
 /**
  * A class representing dry air as a fluid, providing access to various properties of dry air.
  */
@@ -151,7 +149,7 @@ public class DryAir implements Fluid {
      * @return A new `DryAir` instance at standard atmospheric pressure.
      */
     public static DryAir of(Temperature temperature) {
-        return new DryAir(STANDARD_ATMOSPHERE, temperature);
+        return new DryAir(Pressure.STANDARD_ATMOSPHERE, temperature);
     }
 
 }

@@ -12,8 +12,6 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
-import static com.synerset.hvacengine.common.Defaults.STANDARD_ATMOSPHERE;
-
 /**
  * A class representing the properties of humid air, including temperature, pressure, humidity, and more.
  */
@@ -269,7 +267,7 @@ public class HumidAir implements Fluid {
      * @return A `HumidAir` instance.
      */
     public static HumidAir of(Temperature dryBulbTemperature, HumidityRatio humidityRatio) {
-        return new HumidAir(STANDARD_ATMOSPHERE, dryBulbTemperature, humidityRatio);
+        return new HumidAir(Pressure.STANDARD_ATMOSPHERE, dryBulbTemperature, humidityRatio);
     }
 
     /**
@@ -296,7 +294,7 @@ public class HumidAir implements Fluid {
      * @return A `HumidAir` instance.
      */
     public static HumidAir of(Temperature dryBulbTemperature, RelativeHumidity relativeHumidity) {
-        return HumidAir.of(STANDARD_ATMOSPHERE, dryBulbTemperature, relativeHumidity);
+        return HumidAir.of(Pressure.STANDARD_ATMOSPHERE, dryBulbTemperature, relativeHumidity);
     }
 
 }

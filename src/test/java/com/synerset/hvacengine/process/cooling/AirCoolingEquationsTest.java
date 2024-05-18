@@ -1,7 +1,7 @@
 package com.synerset.hvacengine.process.cooling;
 
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
-import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
 import com.synerset.unitility.unitsystem.dimensionless.BypassFactor;
@@ -91,7 +91,7 @@ class AirCoolingEquationsTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
-        RealCoolingResult airCoolingResult = CoolingEquations.coolingFromTargetTemperature(inletFlow, COOLANT_DATA, expectedOutAirTemp);
+        CoolingResult airCoolingResult = CoolingEquations.coolingFromTargetTemperature(inletFlow, COOLANT_DATA, expectedOutAirTemp);
         Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
         Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
         HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();
@@ -118,7 +118,7 @@ class AirCoolingEquationsTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
-        RealCoolingResult airCoolingResult = CoolingEquations.coolingFromTargetRelativeHumidity(inletFlow, COOLANT_DATA, expectedRelativeHumidity);
+        CoolingResult airCoolingResult = CoolingEquations.coolingFromTargetRelativeHumidity(inletFlow, COOLANT_DATA, expectedRelativeHumidity);
         Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
         Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
         RelativeHumidity actualRelativeHumidity = airCoolingResult.outletAirFlow().getRelativeHumidity();
@@ -146,7 +146,7 @@ class AirCoolingEquationsTest {
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
-        RealCoolingResult airCoolingResult = CoolingEquations.coolingFromPower(inletFlow, COOLANT_DATA, expectedHeatOfProcess);
+        CoolingResult airCoolingResult = CoolingEquations.coolingFromPower(inletFlow, COOLANT_DATA, expectedHeatOfProcess);
         Power actualHeatOfProcess = airCoolingResult.heatOfProcess();
         Temperature actualOutAirTemp = airCoolingResult.outletAirFlow().getTemperature();
         HumidityRatio actualHumRatio = airCoolingResult.outletAirFlow().getHumidityRatio();

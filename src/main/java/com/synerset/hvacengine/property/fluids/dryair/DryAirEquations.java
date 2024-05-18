@@ -1,6 +1,6 @@
 package com.synerset.hvacengine.property.fluids.dryair;
 
-import com.synerset.hvacengine.common.utils.MathUtils;
+import com.synerset.hvacengine.common.MathUtils;
 import com.synerset.hvacengine.common.validation.CommonValidators;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 

@@ -1,4 +1,4 @@
-package com.synerset.hvacengine.common.utils;
+package com.synerset.hvacengine.common;
 
 import org.junit.jupiter.api.Test;
 

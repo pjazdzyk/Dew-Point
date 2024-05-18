@@ -54,7 +54,7 @@ public class HeatingValidators {
 
     public static void requireValidInputPowerForHeating(Power inputPower) {
         if (!isValidPowerForHeating(inputPower)) {
-            throw new HvacEngineArgumentException("Power must be provided as positive value for heating. If this intended, use cooling process instead." +
+            throw new HvacEngineArgumentException("Power must be provided as positive value for heating. If this was intended, use cooling process instead." +
                                                   " Q_heat = " + inputPower);
         }
     }

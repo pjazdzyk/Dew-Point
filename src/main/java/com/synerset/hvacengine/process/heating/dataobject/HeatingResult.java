@@ -1,9 +1,9 @@
 package com.synerset.hvacengine.process.heating.dataobject;
 
 import com.synerset.hvacengine.process.ConsoleOutputFormatters;
-import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.ProcessType;
+import com.synerset.hvacengine.process.heating.HeatingMode;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
@@ -11,7 +11,7 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
  * Represents the result of an air heating process.
  */
 public record HeatingResult(ProcessType processType,
-                            ProcessMode processMode,
+                            HeatingMode processMode,
                             FlowOfHumidAir inletAirFlow,
                             FlowOfHumidAir outletAirFlow,
                             Power heatOfProcess) implements ProcessResult {
@@ -22,12 +22,12 @@ public record HeatingResult(ProcessType processType,
 
     public static class Builder {
         private static final ProcessType processType = ProcessType.HEATING;
-        private ProcessMode processMode;
+        private HeatingMode processMode;
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess;
 
-        public Builder processMode(ProcessMode processMode){
+        public Builder processMode(HeatingMode processMode){
             this.processMode = processMode;
             return this;
         }

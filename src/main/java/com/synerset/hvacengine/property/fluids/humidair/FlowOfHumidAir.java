@@ -1,6 +1,5 @@
 package com.synerset.hvacengine.property.fluids.humidair;
 
-import com.synerset.hvacengine.common.Defaults;
 import com.synerset.hvacengine.common.validation.CommonValidators;
 import com.synerset.hvacengine.property.fluids.Flow;
 import com.synerset.hvacengine.property.fluids.FlowEquations;
@@ -254,7 +253,7 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
      * @return A new `FlowOfHumidAir` instance.
      */
     public static FlowOfHumidAir ofValues(double dryBulbTemp, double relHum, double m3hVolFlow) {
-        double pressure = Defaults.STANDARD_ATMOSPHERE.getInPascals();
+        double pressure = Pressure.STANDARD_ATMOSPHERE.getInPascals();
         return ofValues(pressure, dryBulbTemp, relHum, m3hVolFlow);
     }
 

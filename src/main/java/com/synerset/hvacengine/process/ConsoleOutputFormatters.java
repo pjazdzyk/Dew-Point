@@ -1,9 +1,8 @@
 package com.synerset.hvacengine.process;
 
 import com.synerset.hvacengine.process.cooling.CoolantData;
-import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingResult;
 import com.synerset.hvacengine.process.cooling.dataobject.DryCoolingResult;
-import com.synerset.hvacengine.process.cooling.dataobject.RealCoolingResult;
 import com.synerset.hvacengine.process.heating.dataobject.HeatingResult;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
@@ -11,6 +10,7 @@ import com.synerset.hvacengine.property.fluids.liquidwater.FlowOfLiquidWater;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.flow.VolumetricFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
+import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
 import java.util.List;
@@ -25,6 +25,7 @@ public class ConsoleOutputFormatters {
         throw new IllegalStateException("Utility class");
     }
 
+    // Formatters
     /**
      * Returns a formatted string representation of the heating process for console output, including input and output
      * properties.
@@ -52,31 +53,12 @@ public class ConsoleOutputFormatters {
     }
 
     /**
-     * Returns a formatted string representation of the real cooling process for console output, including input and output
-     * properties.
-     *
-     * @return A formatted string representation of the cooling process.
-     */
-    public static String coolingConsoleOutput(RealCoolingResult airCoolingResult) {
-        return "PROCESS OF REAL COOLING:" + NEW_LINE +
-               inputFlowConsoleOutput(airCoolingResult.inletAirFlow()) + NEW_LINE +
-               "COOLANT DATA:" + NEW_LINE +
-               airCoolingResult.coolantData().getSupplyTemperature().toEngineeringFormat("t_su", REL_DIGITS) + SEPARATOR +
-               airCoolingResult.coolantData().getReturnTemperature().toEngineeringFormat("t_rt", REL_DIGITS) + SEPARATOR +
-               airCoolingResult.coolantData().getAverageTemperature().toEngineeringFormat("t_m", REL_DIGITS) + NEW_LINE +
-               coolingPowerConsoleOutput(airCoolingResult.heatOfProcess()) + SEPARATOR +
-               airCoolingResult.bypassFactor().toEngineeringFormat("BF", REL_DIGITS) + NEW_LINE +
-               outputFlowConsoleOutput(airCoolingResult.outletAirFlow()) + NEW_LINE +
-               condensateFlowConsoleOutput(airCoolingResult.condensateFlow()) + NEW_LINE;
-    }
-
-    /**
      * Returns a formatted string representation of the real cooling process for console output from node, including input and output
      * properties.
      *
      * @return A formatted string representation of the cooling process.
      */
-    public static String coolingNodeConsoleOutput(CoolingNodeResult airCoolingResult) {
+    public static String coolingNodeConsoleOutput(CoolingResult airCoolingResult) {
         Temperature supplyTemperature = airCoolingResult.coolantSupplyFlow().getTemperature();
         Temperature returnTemperature = airCoolingResult.coolantReturnFlow().getTemperature();
         CoolantData coolantData = CoolantData.of(supplyTemperature, returnTemperature);
@@ -119,6 +101,7 @@ public class ConsoleOutputFormatters {
                mixingConsoleOutput(mixingResult.outletAirFlow(), "OUTLET FLOW:", "out") + NEW_LINE;
     }
 
+    // Helpers
     private static String outputFlowConsoleOutput(FlowOfHumidAir outletAirFlow) {
         return "OUTLET FLOW:" + NEW_LINE +
                outletAirFlow.getVolFlow().toCubicMetersPerHour().toEngineeringFormat("V_out", REL_DIGITS) + SEPARATOR +
@@ -169,6 +152,12 @@ public class ConsoleOutputFormatters {
                flowOfAir.getRelativeHumidity().toEngineeringFormat("RH_" + suffix, REL_DIGITS) + SEPARATOR +
                flowOfAir.getHumidityRatio().toEngineeringFormat("x_" + suffix, REL_DIGITS) + SEPARATOR +
                flowOfAir.getSpecificEnthalpy().toEngineeringFormat("i_" + suffix, REL_DIGITS);
+    }
+
+    private static String pressureConsoleOutput(Pressure pressure) {
+        return "PRESSURE JUMP:" + NEW_LINE +
+               pressure.toPascal().toEngineeringFormat("dP", REL_DIGITS) + SEPARATOR +
+               pressure.toHectoPascal().toEngineeringFormat("dP", REL_DIGITS);
     }
 
 }

@@ -1,8 +1,8 @@
 package com.synerset.hvacengine.process.cooling;
 
-import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessType;
-import com.synerset.hvacengine.process.cooling.dataobject.CoolingNodeResult;
+import com.synerset.hvacengine.process.cooling.dataobject.CoolingResult;
+import com.synerset.hvacengine.process.source.SimpleDataSource;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.withPrecision;
  * B.Lipska - Projektowanie Wentylacji i Klimatyzacji, Podstawy uzdatniania powietrza. Gliwice 2014.
  * Section: 2.5, page: 57
  */
-class CoolingNodesTest {
+class CoolingBlockTest {
 
     public static HumidAir TEST_HUMID_AIR = HumidAir.of(
             Pressure.ofHectoPascal(987),
@@ -34,21 +34,25 @@ class CoolingNodesTest {
             RelativeHumidity.ofPercentage(40)
     );
     public static FlowOfHumidAir TEST_INLET_AIR_FLOW = FlowOfHumidAir.of(TEST_HUMID_AIR, MassFlow.ofKilogramsPerHour(10_000));
+    private static final SimpleDataSource<FlowOfHumidAir> TEST_INLET_FLOW_SOURCE = SimpleDataSource.of(TEST_INLET_AIR_FLOW);
 
     @Test
     @DisplayName("Cooling node: should heat up inlet air when target temperature is given")
     void shouldCoolInletAirWhenTargetTemperatureIsGiven() {
         // Given
         CoolantData coolantData = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
+        SimpleDataSource<CoolantData> coolantDataSource = SimpleDataSource.of(coolantData);
+
         Temperature targetTemperature = Temperature.ofCelsius(17);
+        SimpleDataSource<Temperature> temperatureDataSource = SimpleDataSource.of(targetTemperature);
 
         Power expectedPower = Power.ofKiloWatts(-73.89739524318315).toWatts();
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(79.82650656031903);
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.010444945743262712);
 
         // When
-        CoolingFromTemperatureBlock coolingNode = CoolingFromTemperatureBlock.of(TEST_INLET_AIR_FLOW, coolantData, targetTemperature);
-        CoolingNodeResult processResults = coolingNode.runProcessCalculations();
+        CoolingFromTemperature coolingBlock = CoolingFromTemperature.of(TEST_INLET_FLOW_SOURCE, coolantDataSource, temperatureDataSource);
+        CoolingResult processResults = coolingBlock.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -57,7 +61,7 @@ class CoolingNodesTest {
         assertThat(processResults.heatOfProcess().getInWatts()).isEqualTo(expectedPower.getInWatts(), withPrecision(1E-9));
         assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
         assertThat(processResults.processType()).isEqualTo(ProcessType.COOLING);
-        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_TEMPERATURE);
+        assertThat(processResults.processMode()).isEqualTo(CoolingMode.FROM_TEMPERATURE);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -83,15 +87,18 @@ class CoolingNodesTest {
     void shouldHCoolInletAirWhenInputPowerIsGiven() {
         // Given
         Power inputPower = Power.ofKiloWatts(-73.89739524318315).toWatts();
+        SimpleDataSource<Power> powerDataSource = SimpleDataSource.of(inputPower);
+
         CoolantData coolantData = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
+        SimpleDataSource<CoolantData> coolantDataSource = SimpleDataSource.of(coolantData);
 
         Temperature expectedTemperature = Temperature.ofCelsius(17);
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(79.82650656031903);
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.010444945743262712);
 
         // When
-        CoolingFromPowerBlock coolingFromPowerNode = CoolingFromPowerBlock.of(TEST_INLET_AIR_FLOW, coolantData, inputPower);
-        CoolingNodeResult processResults = coolingFromPowerNode.runProcessCalculations();
+        CoolingFromPower coolingFromPowerBlock = CoolingFromPower.of(TEST_INLET_FLOW_SOURCE, coolantDataSource, powerDataSource);
+        CoolingResult processResults = coolingFromPowerBlock.runProcessCalculations();
 
         // Then
         assertThat(processResults).isNotNull();
@@ -100,7 +107,7 @@ class CoolingNodesTest {
         assertThat(processResults.heatOfProcess()).isEqualTo(inputPower);
         assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
         assertThat(processResults.processType()).isEqualTo(ProcessType.COOLING);
-        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_POWER);
+        assertThat(processResults.processMode()).isEqualTo(CoolingMode.FROM_POWER);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());
@@ -125,14 +132,18 @@ class CoolingNodesTest {
     void shouldCoolInletAirWhenTargetRelativeHumidityIsGiven() {
         // Given
         CoolantData coolantData = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
+        SimpleDataSource<CoolantData> coolantDataSource = SimpleDataSource.of(coolantData);
+
         RelativeHumidity targetRH = RelativeHumidity.ofPercentage(79.82650656031903);
+        SimpleDataSource<RelativeHumidity> relativeHumidityDataSource = SimpleDataSource.of(targetRH);
+
         Temperature expectedTemperature = Temperature.ofCelsius(17);
         Power expectedPower = Power.ofKiloWatts(-73.89739524318315).toWatts();
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.010444945743501704);
 
         // When
-        CoolingFromHumidityBlock coolingFromHumidityNode = CoolingFromHumidityBlock.of(TEST_INLET_AIR_FLOW, coolantData, targetRH);
-        CoolingNodeResult processResults = coolingFromHumidityNode.runProcessCalculations();
+        CoolingFromHumidity coolingFromHumidityBlock = CoolingFromHumidity.of(TEST_INLET_FLOW_SOURCE, coolantDataSource, relativeHumidityDataSource);
+        CoolingResult processResults = coolingFromHumidityBlock.runProcessCalculations();
         assertThat(processResults.averageCoilWallTemperature()).isEqualTo(Temperature.ofCelsius(11.5));
 
         // Then
@@ -141,7 +152,7 @@ class CoolingNodesTest {
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
         assertThat(processResults.heatOfProcess().getInWatts()).isEqualTo(expectedPower.getInWatts(), withPrecision(1.8E-6));
         assertThat(processResults.processType()).isEqualTo(ProcessType.COOLING);
-        assertThat(processResults.processMode()).isEqualTo(ProcessMode.FROM_HUMIDITY);
+        assertThat(processResults.processMode()).isEqualTo(CoolingMode.FROM_HUMIDITY);
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(TEST_HUMID_AIR.getPressure());

@@ -1,14 +1,14 @@
 package com.synerset.hvacengine.process.cooling.dataobject;
 
 import com.synerset.hvacengine.process.ConsoleOutputFormatters;
-import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.ProcessType;
+import com.synerset.hvacengine.process.cooling.CoolingMode;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 public record DryCoolingResult(ProcessType processType,
-                               ProcessMode processMode,
+                               CoolingMode processMode,
                                FlowOfHumidAir inletAirFlow,
                                FlowOfHumidAir outletAirFlow,
                                Power heatOfProcess) implements ProcessResult {
@@ -21,10 +21,10 @@ public record DryCoolingResult(ProcessType processType,
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private static final ProcessType processType = ProcessType.DRY_COOLING;
-        private ProcessMode processMode;
+        private CoolingMode processMode;
         private Power heatOfProcess;
 
-        public Builder processMode(ProcessMode processMode) {
+        public Builder processMode(CoolingMode processMode) {
             this.processMode = processMode;
             return this;
         }

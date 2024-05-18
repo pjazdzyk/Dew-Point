@@ -1,5 +1,6 @@
 package com.synerset.hvacengine.property.fluids;
 
+import com.synerset.hvacengine.common.ConsolePrintable;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.flow.VolumetricFlow;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
@@ -9,7 +10,7 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
  *
  * @param <F> The type of fluid associated with this flow.
  */
-public interface Flow<F extends Fluid> {
+public interface Flow<F extends Fluid> extends ConsolePrintable {
 
     /**
      * Get the fluid associated with this flow.
@@ -68,13 +69,6 @@ public interface Flow<F extends Fluid> {
     SpecificEnthalpy getSpecificEnthalpy();
 
     /**
-     * Convert the flow properties to a formatted string.
-     *
-     * @return A formatted string representation of the flow properties.
-     */
-    String toConsoleOutput();
-
-    /**
      * Compare this flow with another flow of the same type for equality within a specified precision.
      *
      * @param flowOfFluid The flow to compare with.
@@ -90,4 +84,5 @@ public interface Flow<F extends Fluid> {
         return getFluid().isEqualsWithPrecision(flowOfFluid.getFluid(), epsilon)
                 && getMassFlow().isEqualWithPrecision(flowOfFluid.getMassFlow(), epsilon);
     }
+
 }

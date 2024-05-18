@@ -1,11 +1,12 @@
 package com.synerset.hvacengine.property.fluids;
 
+import com.synerset.hvacengine.common.ConsolePrintable;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 /**
  * An interface representing a fluid, providing access to various properties of the fluid.
  */
-public interface Fluid {
+public interface Fluid extends ConsolePrintable {
 
     /**
      * Get the temperature of the fluid.
@@ -41,13 +42,6 @@ public interface Fluid {
      * @return The specific enthalpy in appropriate units.
      */
     SpecificEnthalpy getSpecificEnthalpy();
-
-    /**
-     * Convert the fluid properties to a formatted string.
-     *
-     * @return A formatted string representation of the fluid properties.
-     */
-    String toConsoleOutput();
 
     /**
      * Compare this fluid with another fluid of the same type for equality within a specified precision.

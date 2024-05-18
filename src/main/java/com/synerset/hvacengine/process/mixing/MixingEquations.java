@@ -1,7 +1,6 @@
 package com.synerset.hvacengine.process.mixing;
 
 import com.synerset.hvacengine.common.validation.CommonValidators;
-import com.synerset.hvacengine.process.ProcessMode;
 import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
@@ -33,7 +32,7 @@ public class MixingEquations {
 
         if (mdaRec == 0.0 || mdaOut == 0.0) {
             return MixingResult.builder()
-                    .processMode(ProcessMode.SIMPLE_MIXING)
+                    .processMode(MixingMode.SIMPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
                     .recirculationFlows(List.of(recirculationAirFlow))
@@ -57,7 +56,7 @@ public class MixingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
         return MixingResult.builder()
-                .processMode(ProcessMode.SIMPLE_MIXING)
+                .processMode(MixingMode.SIMPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
                 .recirculationFlows(List.of(recirculationAirFlow))
@@ -69,7 +68,7 @@ public class MixingEquations {
 
         if (recirculationAirFlows == null || recirculationAirFlows.isEmpty() || inletAir.getMassFlow().isCloseToZero() || sumOfAllFlows(recirculationAirFlows).isCloseToZero()) {
             return MixingResult.builder()
-                    .processMode(ProcessMode.MULTIPLE_MIXING)
+                    .processMode(MixingMode.MULTIPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
                     .recirculationFlows(recirculationAirFlows)
@@ -102,7 +101,7 @@ public class MixingEquations {
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
         return MixingResult.builder()
-                .processMode(ProcessMode.MULTIPLE_MIXING)
+                .processMode(MixingMode.MULTIPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
                 .recirculationFlows(recirculationAirFlows)

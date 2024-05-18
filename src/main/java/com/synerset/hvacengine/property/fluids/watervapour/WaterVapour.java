@@ -11,8 +11,6 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
-import static com.synerset.hvacengine.common.Defaults.STANDARD_ATMOSPHERE;
-
 public class WaterVapour implements Fluid {
     public static final Pressure PRESSURE_MIN_LIMIT = Pressure.ofPascal(0);
     public static final Temperature TEMPERATURE_MIN_LIMIT = Temperature.ofCelsius(-150);
@@ -150,11 +148,11 @@ public class WaterVapour implements Fluid {
     }
 
     public static WaterVapour of(Temperature temperature, RelativeHumidity relativeHumidity) {
-        return new WaterVapour(STANDARD_ATMOSPHERE, temperature, relativeHumidity);
+        return new WaterVapour(Pressure.STANDARD_ATMOSPHERE, temperature, relativeHumidity);
     }
 
     public static WaterVapour of(Temperature temperature) {
-        return new WaterVapour(STANDARD_ATMOSPHERE, temperature, null);
+        return new WaterVapour(Pressure.STANDARD_ATMOSPHERE, temperature, null);
     }
 
 }

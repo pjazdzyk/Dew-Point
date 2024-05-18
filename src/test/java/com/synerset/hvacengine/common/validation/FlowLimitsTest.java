@@ -1,6 +1,5 @@
 package com.synerset.hvacengine.common.validation;
 
-import com.synerset.hvacengine.common.Defaults;
 import com.synerset.hvacengine.common.exception.HvacEngineArgumentException;
 import com.synerset.hvacengine.common.exception.HvacEngineMissingArgumentException;
 import com.synerset.hvacengine.property.fluids.dryair.DryAir;
@@ -13,7 +12,9 @@ import com.synerset.hvacengine.property.fluids.watervapour.FlowOfWaterVapour;
 import com.synerset.hvacengine.property.fluids.watervapour.WaterVapour;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.flow.VolumetricFlow;
+import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
+import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,13 +22,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FlowLimitsTest {
 
+    private static final Temperature INDOOR_SUMMER_TEMP = Temperature.ofCelsius(25.0);
+    private static final RelativeHumidity INDOOR_SUMMER_RH = RelativeHumidity.ofPercentage(50.0);
+
     @Test
     @DisplayName("Flows: should throw exception when null passed as argument")
     void shouldThrowNullPointerExceptionWhenNullIsPassedAsArgumentFlows() {
-        DryAir dryAir = DryAir.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP);
-        LiquidWater liquidWater = LiquidWater.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP);
-        WaterVapour waterVapour = WaterVapour.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP);
-        HumidAir humidAir = HumidAir.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP, Defaults.INDOOR_SUMMER_RH);
+        DryAir dryAir = DryAir.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP);
+        LiquidWater liquidWater = LiquidWater.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP);
+        WaterVapour waterVapour = WaterVapour.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP);
+        HumidAir humidAir = HumidAir.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP, INDOOR_SUMMER_RH);
         MassFlow massFlow = MassFlow.ofKilogramsPerSecond(1);
         MassFlow nullMassFlow = null;
         VolumetricFlow nullVolFlow = null;
@@ -54,7 +58,7 @@ class FlowLimitsTest {
     @Test
     @DisplayName("FlowOfDryAir: should throw exception when arguments exceeds limits")
     void shouldThrowExceptionWhenArgumentsExceedsLimitsDryAir() {
-        DryAir dryAir = DryAir.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP);
+        DryAir dryAir = DryAir.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP);
         MassFlow exceededMinLimit = MassFlow.ofKilogramsPerSecond(-1);
         MassFlow exceededMaxLimit = MassFlow.ofKilogramsPerSecond(5E9 + 1);
         assertThatThrownBy(() -> FlowOfDryAir.of(dryAir, exceededMinLimit))
@@ -66,7 +70,7 @@ class FlowLimitsTest {
     @Test
     @DisplayName("FlowOfWater: should throw exception when arguments exceeds limits")
     void shouldThrowExceptionWhenArgumentsExceedsLimitsWater() {
-        LiquidWater liquidWater = LiquidWater.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP);
+        LiquidWater liquidWater = LiquidWater.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP);
         MassFlow exceededMinLimit = MassFlow.ofKilogramsPerSecond(-1);
         MassFlow exceededMaxLimit = MassFlow.ofKilogramsPerSecond(5E9 + 1);
         assertThatThrownBy(() -> FlowOfLiquidWater.of(liquidWater, exceededMinLimit))
@@ -78,7 +82,7 @@ class FlowLimitsTest {
     @Test
     @DisplayName("HumidAir: should throw exception when arguments exceeds limits")
     void shouldThrowExceptionWhenArgumentsExceedsLimitsHumidAir() {
-        HumidAir humidAir = HumidAir.of(Pressure.STANDARD_ATMOSPHERE, Defaults.INDOOR_SUMMER_TEMP, Defaults.INDOOR_SUMMER_RH);
+        HumidAir humidAir = HumidAir.of(Pressure.STANDARD_ATMOSPHERE, INDOOR_SUMMER_TEMP, INDOOR_SUMMER_RH);
         MassFlow exceededMinLimit = MassFlow.ofKilogramsPerSecond(-1);
         MassFlow exceededMaxLimit = MassFlow.ofKilogramsPerSecond(5E9 + 1);
         assertThatThrownBy(() -> FlowOfHumidAir.of(humidAir, exceededMinLimit))

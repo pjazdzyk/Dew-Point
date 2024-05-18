@@ -6,8 +6,6 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.Objects;
 
-import static com.synerset.hvacengine.common.Defaults.STANDARD_ATMOSPHERE;
-
 /**
  * Represents liquid water with associated thermodynamic properties.
  * This class implements the Fluid interface.
@@ -128,7 +126,7 @@ public class LiquidWater implements Fluid {
      * @return A new LiquidWater object.
      */
     public static LiquidWater of(Temperature temperature) {
-        return new LiquidWater(STANDARD_ATMOSPHERE, temperature);
+        return new LiquidWater(Pressure.STANDARD_ATMOSPHERE, temperature);
     }
 
 }
