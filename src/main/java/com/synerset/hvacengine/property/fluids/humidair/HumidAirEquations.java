@@ -11,7 +11,7 @@ import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 
-import java.util.function.DoubleFunction;
+import java.util.function.DoubleUnaryOperator;
 
 /**
  * MOIST AIR PROPERTY EQUATIONS LIBRARY (psYCHROMETRICS)
@@ -85,7 +85,7 @@ public final class HumidAirEquations {
         final double C12 = -1.4452093E-08;
         final double C13 = 6.5459673E+00;
 
-        DoubleFunction<Double> satPressureExpression;
+        DoubleUnaryOperator satPressureExpression;
 
         if (ta < 0.0) {
             a = 6.1115;
@@ -209,9 +209,9 @@ public final class HumidAirEquations {
         if (rh >= 100.0)
             return ta;
         double estimatedWbt = ta * Math.atan(0.151977 * Math.pow(rh + 8.313659, 0.5))
-                + Math.atan(ta + rh) - Math.atan(rh - 1.676331)
-                + 0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh)
-                - 4.686035;
+                              + Math.atan(ta + rh) - Math.atan(rh - 1.676331)
+                              + 0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh)
+                              - 4.686035;
         double ps = saturationPressure(ta);
         double x = humidityRatio(rh, ps, pat);
         double h = specificEnthalpy(ta, x, pat);
@@ -348,12 +348,12 @@ public final class HumidAirEquations {
         double xm = x * 1.61;
         double dynVisWv = WaterVapourEquations.dynamicViscosity(ta);
         double fiAV = Math.pow(1 + Math.pow(dynVisDa / dynVisWv, 0.5)
-                * Math.pow(WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS / DryAirEquations.DRY_AIR_MOLECULAR_MASS, 0.25), 2)
-                / (2 * Math.sqrt(2) * Math.pow(1 + (DryAirEquations.DRY_AIR_MOLECULAR_MASS / WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS), 0.5));
+                                   * Math.pow(WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS / DryAirEquations.DRY_AIR_MOLECULAR_MASS, 0.25), 2)
+                      / (2 * Math.sqrt(2) * Math.pow(1 + (DryAirEquations.DRY_AIR_MOLECULAR_MASS / WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS), 0.5));
 
         double fiVA = Math.pow(1 + Math.pow(dynVisWv / dynVisDa, 0.5)
-                * Math.pow(DryAirEquations.DRY_AIR_MOLECULAR_MASS / WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS, 0.25), 2)
-                / (2 * Math.sqrt(2) * Math.pow(1 + (WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS / DryAirEquations.DRY_AIR_MOLECULAR_MASS), 0.5));
+                                   * Math.pow(DryAirEquations.DRY_AIR_MOLECULAR_MASS / WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS, 0.25), 2)
+                      / (2 * Math.sqrt(2) * Math.pow(1 + (WaterVapourEquations.WATER_VAPOUR_MOLECULAR_MASS / DryAirEquations.DRY_AIR_MOLECULAR_MASS), 0.5));
 
         return (dynVisDa / (1 + fiAV * xm)) + (dynVisWv / (1 + fiVA / xm));
     }
