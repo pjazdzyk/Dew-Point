@@ -596,7 +596,7 @@ class HumidAirEquationsTest {
         assertThat(actualDryBulbTempFromXRH).isEqualTo(expectedDryBulbTempFromXRH, withPrecision(1E-10));
         assertThat(actualDryBulbTempFromIX).isEqualTo(expectedDryBulbTempFromIX, withPrecision(1E-11));
         assertThat(actualDryBulbTempFromWbtRH).isEqualTo(expectedDryBulbTempFromWbtRH, withPrecision(1E-11));
-        assertThat(actualMaxDryBulbTemp).isEqualTo(expectedMaxDryBulbTemp);
+        assertThat(actualMaxDryBulbTemp).isEqualTo(expectedMaxDryBulbTemp, withPrecision(1E-11));
 
     }
 

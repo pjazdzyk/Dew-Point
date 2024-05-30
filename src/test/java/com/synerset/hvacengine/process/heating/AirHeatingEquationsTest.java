@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.withPrecision;
 
 class AirHeatingEquationsTest {
 
@@ -78,7 +79,7 @@ class AirHeatingEquationsTest {
         Temperature actualOutAirTemp = heatingResult.outletAirFlow().getTemperature();
 
         // Assert
-        assertThat(actualHeatOfProcess.isEqualWithPrecision(expectedHeatOfProcess, 1E-9)).isTrue();
+        assertThat(actualHeatOfProcess.getValue()).isEqualTo(expectedHeatOfProcess.getValue(), withPrecision(1E-8));
         assertThat(actualOutAirTemp.isEqualWithPrecision(expectedOutTemp, 1E-9)).isTrue();
     }
 

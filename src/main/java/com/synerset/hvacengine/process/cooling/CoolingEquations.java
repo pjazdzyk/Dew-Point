@@ -150,10 +150,10 @@ public class CoolingEquations {
         DryCoolingResult dryCooling = dryCoolingFromPower(inletAirFlow, inputPower);
         double tmin = inletAirFlow.getTemperature().getInCelsius();
         double tmax = dryCooling.outletAirFlow().getTemperature().getInCelsius();
-        BrentSolver solver = new BrentSolver("[CoolingFromPower]");
+        BrentSolver solver = BrentSolver.of("[CoolingFromPower]");
         solver.setCounterpartPoints(tmin, tmax);
         CoolingResult[] coolingResults = new CoolingResult[1];
-        solver.calcForFunction(outTemp -> {
+        solver.findRoot(outTemp -> {
             CoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(outTemp));
             coolingResults[0] = airCoolingResult;
             Power calculatedQ = airCoolingResult.heatOfProcess();
@@ -309,14 +309,14 @@ public class CoolingEquations {
         }
 
         // Iterative procedure to determine which outlet temperature will result in expected RH.
-        BrentSolver solver = new BrentSolver("calcCoolingFromOutletRH SOLVER");
+        BrentSolver solver = BrentSolver.of("calcCoolingFromOutletRH SOLVER");
         double tIn = inletAirFlow.getTemperature().getInCelsius();
         double tdpIn = inletAirFlow.getTemperature().getInCelsius();
         solver.setCounterpartPoints(tIn, tdpIn);
         double rhOut = targetRelativeHumidity.getInPercent();
         CoolingResult[] coolingResults = new CoolingResult[1];
 
-        solver.calcForFunction(testOutTx -> {
+        solver.findRoot(testOutTx -> {
             CoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(testOutTx));
             coolingResults[0] = airCoolingResult;
             FlowOfHumidAir outletFlow = airCoolingResult.outletAirFlow();

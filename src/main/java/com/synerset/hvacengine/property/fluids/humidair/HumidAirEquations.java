@@ -101,9 +101,11 @@ public final class HumidAirEquations {
         // Estimated saturation pressure for convergence speedup
         estimatedSatPressure = a * Math.exp(calcAlfaT(ta)) * 100.0;
 
-        BrentSolver solver = new BrentSolver("P_SOLVER", 2, 0);
+        BrentSolver solver = BrentSolver.of("P_SOLVER");
+        solver.setEvalDividerX2(2);
+        solver.setEvalDividerX2Value(5);
         solver.setCounterpartPoints(estimatedSatPressure * SOLVER_A_COEF, estimatedSatPressure * SOLVER_B_COEF * n);
-        expectedSatPressure = solver.calcForFunction(satPressureExpression);
+        expectedSatPressure = solver.findRoot(satPressureExpression);
         return expectedSatPressure;
     }
 
@@ -169,12 +171,14 @@ public final class HumidAirEquations {
         if (rh < 25.0) {
             double ps = saturationPressure(ta);
             double x = humidityRatio(rh, ps, pat);
-            BrentSolver solver = new BrentSolver("T_SOLVER", 2, 5);
+            BrentSolver solver = BrentSolver.of("T_SOLVER");
+            solver.setEvalDividerX2(2);
+            solver.setEvalDividerX2Value(5);
             solver.setCounterpartPoints(tdpEstimated * SOLVER_A_COEF, tdpEstimated * SOLVER_B_COEF);
             if (rh < 1.0) {
                 solver.setAccuracy(0.0000001);
             }
-            double tdpExact = solver.calcForFunction(temp -> {
+            double tdpExact = solver.findRoot(temp -> {
                 double ps1 = saturationPressure(temp);
                 double x1 = maxHumidityRatio(ps1, pat);
                 return x1 - x;
@@ -215,9 +219,11 @@ public final class HumidAirEquations {
         double ps = saturationPressure(ta);
         double x = humidityRatio(rh, ps, pat);
         double h = specificEnthalpy(ta, x, pat);
-        BrentSolver solver = new BrentSolver("T_SOLVER", 2, 5);
+        BrentSolver solver = BrentSolver.of("T_SOLVER");
+        solver.setEvalDividerX2(2);
+        solver.setEvalDividerX2Value(5);
         solver.setCounterpartPoints(estimatedWbt * SOLVER_A_COEF, estimatedWbt * SOLVER_B_COEF);
-        return solver.calcForFunction(temp -> {
+        return solver.findRoot(temp -> {
             double ps1 = saturationPressure(temp);
             double x1 = maxHumidityRatio(ps1, pat);
             double h1 = specificEnthalpy(temp, x1, pat);
@@ -552,7 +558,7 @@ public final class HumidAirEquations {
         //at the same time.
         BrentSolver solver = new BrentSolver();
         solver.setCounterpartPoints(taEstimated * SOLVER_A_COEF, taEstimated * SOLVER_B_COEF);
-        return solver.calcForFunction(temp -> tdp - dewPointTemperature(temp, rh, pat));
+        return solver.findRoot(temp -> tdp - dewPointTemperature(temp, rh, pat));
     }
 
     public static Temperature dryBulbTemperatureTdpRH(Temperature dewPointTemp, RelativeHumidity relHum, Pressure absPressure) {
@@ -574,8 +580,10 @@ public final class HumidAirEquations {
      * @return dry bulb air temperature, oC
      */
     public static double dryBulbTemperatureXRH(double x, double rh, double pat) {
-        BrentSolver solver = new BrentSolver("T_Xrh_SOLVER", 2, 5);
-        return solver.calcForFunction(tx -> saturationPressure(x, rh, pat) - saturationPressure(tx));
+        BrentSolver solver = BrentSolver.of("T_Xrh_SOLVER");
+        solver.setEvalDividerX2(2);
+        solver.setEvalDividerX2Value(5);
+        return solver.findRoot(tx -> saturationPressure(x, rh, pat) - saturationPressure(tx));
     }
 
     public static Temperature dryBulbTemperatureXRH(HumidityRatio humidityRatio, RelativeHumidity relHum, Pressure absPressure) {
@@ -598,8 +606,10 @@ public final class HumidAirEquations {
      * @return air dry bulb temperature, oC
      */
     public static double dryBulbTemperatureIX(double ix, double x, double pat) {
-        BrentSolver solver = new BrentSolver("T_IX_SOLVER", 2, 5);
-        return solver.calcForFunction(tx -> ix - HumidAirEquations.specificEnthalpy(tx, x, pat));
+        BrentSolver solver = BrentSolver.of("T_IX_SOLVER");
+        solver.setEvalDividerX2(2);
+        solver.setEvalDividerX2Value(5);
+        return solver.findRoot(tx -> ix - HumidAirEquations.specificEnthalpy(tx, x, pat));
     }
 
     public static Temperature dryBulbTemperatureIX(SpecificEnthalpy specEnthalpy, HumidityRatio humidityRatio, Pressure absPressure) {
@@ -623,8 +633,8 @@ public final class HumidAirEquations {
      * @return air dry bulb temperature, oC
      */
     public static double dryBulbTemperatureWbtRH(double wbt, double rh, double pat) {
-        BrentSolver solver = new BrentSolver("T_WbtRH_SOLVER");
-        return solver.calcForFunction(temp -> wbt - wetBulbTemperature(temp, rh, pat));
+        BrentSolver solver = BrentSolver.of("T_WbtRH_SOLVER");
+        return solver.findRoot(temp -> wbt - wetBulbTemperature(temp, rh, pat));
     }
 
     public static Temperature dryBulbTemperatureWbtRH(Temperature wetBulbTemperature, RelativeHumidity relHum, Pressure absPressure) {
@@ -647,7 +657,7 @@ public final class HumidAirEquations {
         double estimatedTa = -237300 * Math.log(0.001638 * inPat) / (1000 * Math.log(0.001638 * inPat) - 17269);
         BrentSolver solver = new BrentSolver();
         solver.setCounterpartPoints(estimatedTa * SOLVER_A_COEF, estimatedTa * SOLVER_B_COEF * 1.5);
-        return solver.calcForFunction(ta -> inPat - saturationPressure(ta));
+        return solver.findRoot(ta -> inPat - saturationPressure(ta));
     }
 
     public static Temperature dryBulbTemperatureMax(Pressure absPressure) {

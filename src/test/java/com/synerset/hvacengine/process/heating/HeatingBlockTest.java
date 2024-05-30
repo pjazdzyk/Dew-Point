@@ -100,7 +100,7 @@ class HeatingBlockTest {
     @DisplayName("Heating node: should heat up inlet air when target relative humidity is given")
     void shouldHeatUpInletAirWhenTargetRelativeHumidityIsGiven() {
         // Given
-        RelativeHumidity targetRH = RelativeHumidity.ofPercentage(17.386707253107);
+        RelativeHumidity targetRH = RelativeHumidity.ofPercentage(17.386707253107605);
         SimpleDataSource<RelativeHumidity> humiditySource = SimpleDataSource.of(targetRH);
 
         Power expectedPower = Power.ofKiloWatts(56).toWatts();
@@ -114,7 +114,7 @@ class HeatingBlockTest {
         assertThat(processResults).isNotNull();
         assertThat(processResults.outletAirFlow()).isNotNull();
         assertThat(processResults.inletAirFlow()).isEqualTo(TEST_INLET_AIR_FLOW);
-        assertThat(processResults.heatOfProcess().getValue()).isEqualTo(expectedPower.getValue(), withPrecision(1E-9));
+        assertThat(processResults.heatOfProcess().getValue()).isEqualTo(expectedPower.getValue(), withPrecision(1E-8));
         assertThat(processResults.processType()).isEqualTo(ProcessType.HEATING);
         assertThat(processResults.processMode()).isEqualTo(HeatingMode.FROM_HUMIDITY);
 

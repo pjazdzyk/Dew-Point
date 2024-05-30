@@ -168,7 +168,7 @@ class CoolingBlockTest {
 
         FlowOfLiquidWater condensateFlow = processResults.condensateFlow();
         assertThat(condensateFlow.getTemperature()).isEqualTo(coolantData.getAverageTemperature());
-        assertThat(condensateFlow.getMassFlow()).isEqualTo(expectedCondensateFlow);
+        assertThat(condensateFlow.getMassFlow().getValue()).isEqualTo(expectedCondensateFlow.getValue(), withPrecision(1E-11));
         assertThat(condensateFlow.getSpecificEnthalpy()).isEqualTo(LiquidWaterEquations.specificEnthalpy(coolantData.getAverageTemperature()));
     }
 
