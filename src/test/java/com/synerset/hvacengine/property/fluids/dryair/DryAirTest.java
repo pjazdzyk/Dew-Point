@@ -1,5 +1,6 @@
 package com.synerset.hvacengine.property.fluids.dryair;
 
+import com.synerset.hvacengine.property.fluids.SharedEquations;
 import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,9 @@ class DryAirTest {
         double expectedDynVis = DryAirEquations.dynamicViscosity(inputAirTemp);
         double expectedKinViscosity = DryAirEquations.kinematicViscosity(inputAirTemp, inputPressure);
         double expectedThermalConductivity = DryAirEquations.thermalConductivity(inputAirTemp);
+        double expectedDensity = DryAirEquations.density(inputAirTemp, inputPressure);
+        double expectedThermalDiffusivity = SharedEquations.thermalDiffusivity(expectedDensity, expectedThermalConductivity, expectedSpecHeat);
+        double expectedPrandtlNumber = SharedEquations.prandtlNumber(expectedDynVis, expectedThermalConductivity, expectedSpecHeat);
 
         // When
         DryAir dryAir = DryAir.of(
@@ -34,6 +38,9 @@ class DryAirTest {
         double actualDynVis = dryAir.getDynamicViscosity().getValue();
         double actualKinViscosity = dryAir.getKinematicViscosity().getValue();
         double actualThermalConductivity = dryAir.getThermalConductivity().getValue();
+        double actualDensity = dryAir.getDensity().getValue();
+        double actualThermalDiffusivity = dryAir.getThermalDiffusivity().getValue();
+        double actualPrandtlNumber = dryAir.getPrandtlNumber().getValue();
 
         // Then
         assertThat(actualPressure).isEqualTo(inputPressure);
@@ -43,5 +50,8 @@ class DryAirTest {
         assertThat(actualDynVis).isEqualTo(expectedDynVis);
         assertThat(actualKinViscosity).isEqualTo(expectedKinViscosity);
         assertThat(actualThermalConductivity).isEqualTo(expectedThermalConductivity);
+        assertThat(actualDensity).isEqualTo(expectedDensity);
+        assertThat(actualThermalDiffusivity).isEqualTo(expectedThermalDiffusivity);
+        assertThat(actualPrandtlNumber).isEqualTo(expectedPrandtlNumber);
     }
 }

@@ -24,6 +24,7 @@ public class DryAir implements Fluid {
     private final DynamicViscosity dynamicViscosity;
     private final KinematicViscosity kinematicViscosity;
     private final ThermalConductivity thermalConductivity;
+    private final ThermalDiffusivity thermalDiffusivity;
     private final PrandtlNumber prandtlNumber;
 
     /**
@@ -45,6 +46,7 @@ public class DryAir implements Fluid {
         this.dynamicViscosity = DryAirEquations.dynamicViscosity(temperature);
         this.kinematicViscosity = DryAirEquations.kinematicViscosity(temperature, pressure);
         this.thermalConductivity = DryAirEquations.thermalConductivity(temperature);
+        this.thermalDiffusivity = SharedEquations.thermalDiffusivity(density, thermalConductivity, specificHeat);
         this.prandtlNumber = SharedEquations.prandtlNumber(dynamicViscosity, thermalConductivity, specificHeat);
     }
 
@@ -80,6 +82,10 @@ public class DryAir implements Fluid {
         return thermalConductivity;
     }
 
+    public ThermalDiffusivity getThermalDiffusivity() {
+        return thermalDiffusivity;
+    }
+
     public PrandtlNumber getPrandtlNumber() {
         return prandtlNumber;
     }
@@ -98,6 +104,7 @@ public class DryAir implements Fluid {
                 kinematicViscosity.toEngineeringFormat("ν_da", digits) + separator +
                 dynamicViscosity.toEngineeringFormat("μ_da", digits) + separator +
                 thermalConductivity.toEngineeringFormat("k_da", digits) + separator +
+                thermalDiffusivity.toEngineeringFormat("α", digits) + separator +
                 prandtlNumber.toEngineeringFormat("Pr_da", digits) + "\n";
     }
 

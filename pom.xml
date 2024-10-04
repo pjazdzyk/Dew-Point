@@ -5,7 +5,7 @@
 
     <groupId>com.synerset</groupId>
     <artifactId>hvac-engine</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
     <name>hvac-engine</name>
     <description>
         HVAC|Engine is a comprehensive library for calculating moist air properties, including crucial thermodynamic
@@ -37,16 +37,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Synerset library versions -->
         <brent-solver.version>2.0.0</brent-solver.version>
-        <unitility.version>2.4.1</unitility.version>
+        <unitility.version>2.4.3</unitility.version>
         <!-- Dependency versions -->
-        <assertJ.version>3.26.0</assertJ.version>
-        <junit-jupiter-api.version>5.10.2</junit-jupiter-api.version>
+        <assertJ.version>3.26.3</assertJ.version>
+        <junit-jupiter-api.version>5.11.0</junit-jupiter-api.version>
         <!-- Plugins versions -->
         <jacoco.version>0.8.11</jacoco.version>
         <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.10.0</maven-javadoc-plugin.version>
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <!-- Sonar Cloud Properties-->
         <sonar.organization>synerset</sonar.organization>
