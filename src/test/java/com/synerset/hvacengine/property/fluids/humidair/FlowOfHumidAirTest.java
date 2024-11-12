@@ -24,7 +24,7 @@ class FlowOfHumidAirTest {
         double densityDa = sampleAir.getDryAirComponent().getDensity().getInKilogramsPerCubicMeters();
         double humidRatio = sampleAir.getHumidityRatio().getInKilogramPerKilogram();
         double expectedVolFlow_Ma = INIT_MASS_FLOW_MA / densityMa;
-        double expectedMassFlow_Da = FlowEquations.massFlowHaToMassFlowDa(humidRatio, INIT_MASS_FLOW_MA);
+        double expectedMassFlow_Da = FlowEquations.massFlowDaFromMassFlowHa(humidRatio, INIT_MASS_FLOW_MA);
         double expectedVolFlow_Da = expectedMassFlow_Da / densityDa;
 
         // Act

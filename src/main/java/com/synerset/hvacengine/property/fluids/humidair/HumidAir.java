@@ -152,6 +152,46 @@ public class HumidAir implements Fluid {
         return dryAirComponent;
     }
 
+    /**
+     * Creates a new {@code HumidAir} instance with the specified dry bulb temperature.
+     *
+     * @param dryBulbTemperature the temperature of the humid air at constant pressure
+     * @return a new {@code HumidAir} instance with the specified dry bulb temperature
+     */
+    public HumidAir withDryBulbTemperature(Temperature dryBulbTemperature) {
+        return HumidAir.of(pressure, dryBulbTemperature, humidityRatio);
+    }
+
+    /**
+     * Creates a new {@code HumidAir} instance with the specified pressure.
+     *
+     * @param pressure the pressure of the humid air
+     * @return a new {@code HumidAir} instance with the specified pressure
+     */
+    public HumidAir withPressure(Pressure pressure) {
+        return HumidAir.of(pressure, temperature, humidityRatio);
+    }
+
+    /**
+     * Creates a new {@code HumidAir} instance with the specified humidity ratio.
+     *
+     * @param humidityRatio the humidity ratio of the humid air, defined as the mass of water vapor per unit mass of dry air
+     * @return a new {@code HumidAir} instance with the specified humidity ratio
+     */
+    public HumidAir withHumidityRatio(HumidityRatio humidityRatio) {
+        return HumidAir.of(pressure, temperature, humidityRatio);
+    }
+
+    /**
+     * Creates a new {@code HumidAir} instance with the specified relative humidity.
+     *
+     * @param relativeHumidity the relative humidity of the humid air, typically as a percentage
+     * @return a new {@code HumidAir} instance with the specified relative humidity
+     */
+    public HumidAir withRelativeHumidity(RelativeHumidity relativeHumidity) {
+        return HumidAir.of(pressure, temperature, relativeHumidity);
+    }
+
     @Override
     public String toConsoleOutput() {
         String separator = " | ";

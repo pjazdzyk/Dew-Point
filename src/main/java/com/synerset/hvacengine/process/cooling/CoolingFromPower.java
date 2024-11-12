@@ -53,9 +53,10 @@ public class CoolingFromPower implements HvacProcessBlock {
         heatConnector.updateConnectorData();
 
         FlowOfHumidAir inletAirFlow = inputAirFlowConnector.getConnectorData();
-        Power heatingPower = heatConnector.getConnectorData();
+        Power coolingPower = heatConnector.getConnectorData();
         CoolantData coolantData = coolantDataInputConnector.getConnectorData();
-        CoolingResult results = CoolingEquations.coolingFromPower(inletAirFlow, coolantData, heatingPower);
+
+        CoolingResult results = CoolingEquations.coolingFromPower(inletAirFlow, coolantData, coolingPower);
 
         outputAirFlowConnector.setConnectorData(results.outletAirFlow());
         outputCondensateConnector.setConnectorData(results.condensateFlow());

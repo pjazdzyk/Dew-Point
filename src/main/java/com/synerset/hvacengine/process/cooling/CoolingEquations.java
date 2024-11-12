@@ -26,6 +26,8 @@ import static com.synerset.hvacengine.process.cooling.CoolingValidators.*;
 
 public class CoolingEquations {
 
+    private static final double REALISTIC_POWER_FACTOR = 0.95;
+
     private CoolingEquations() {
         throw new IllegalStateException("Utility class");
     }
@@ -126,7 +128,6 @@ public class CoolingEquations {
         requireNotNull(inletCoolantData);
         requireNotNull(inputPower);
         requireValidInputPowerForCooling(inputPower);
-        requirePhysicalInputPowerForCooling(inletAirFlow, inputPower);
 
         if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero()) {
             LiquidWater condensate = LiquidWater.of(inletAirFlow.getTemperature());
@@ -146,8 +147,23 @@ public class CoolingEquations {
                     .build();
         }
 
+        // Defensive algorithm, which will allow only cooling power to reach 95% of average wall temperature, to keep BF min at 0.05
+        // It assumes that it is not possible to cool down air to the temperature lower than average coil wall temperature
+        HumidAir inletAir = inletAirFlow.getFluid();
+        HumidAir nearWallAir = inletAir.withDryBulbTemperature(inletCoolantData.getAverageTemperature());
+
+        double acceptablePowerValueInKw = nearWallAir.getSpecificEnthalpy().minus(inletAir.getSpecificEnthalpy())
+                                                  .getInKiloJoulesPerKiloGram()
+                                          * REALISTIC_POWER_FACTOR
+                                          * inletAirFlow.getDryAirMassFlow().getInKilogramsPerSecond();
+        Power acceptablePower = Power.ofKiloWatts(acceptablePowerValueInKw);
+
+        Power powerForFurtherCalculations = inputPower.isLowerThan(acceptablePower)
+                ? acceptablePower
+                : inputPower;
+
         // For the provided inputHeat, maximum possible cooling will occur for completely dry air, where no energy will be used for condensate discharge
-        DryCoolingResult dryCooling = dryCoolingFromPower(inletAirFlow, inputPower);
+        DryCoolingResult dryCooling = dryCoolingFromPower(inletAirFlow, powerForFurtherCalculations);
         double tmin = inletAirFlow.getTemperature().getInCelsius();
         double tmax = dryCooling.outletAirFlow().getTemperature().getInCelsius();
         BrentSolver solver = BrentSolver.of("[CoolingFromPower]");
@@ -157,7 +173,7 @@ public class CoolingEquations {
             CoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(outTemp));
             coolingResults[0] = airCoolingResult;
             Power calculatedQ = airCoolingResult.heatOfProcess();
-            return calculatedQ.getInWatts() - inputPower.getInWatts();
+            return calculatedQ.getInWatts() - powerForFurtherCalculations.getInWatts();
         });
 
         return coolingResults[0].withProcessMode(CoolingMode.FROM_POWER);

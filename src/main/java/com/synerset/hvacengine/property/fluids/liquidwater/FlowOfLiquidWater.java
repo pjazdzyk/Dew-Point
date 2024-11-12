@@ -35,7 +35,7 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
         CommonValidators.requireBetweenBoundsInclusive(massFlow, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         this.liquidWater = liquidWater;
         this.massFlow = massFlow;
-        this.volFlow = FlowEquations.massFlowToVolFlow(liquidWater.getDensity(), massFlow);
+        this.volFlow = FlowEquations.volFlowFromMassFlow(liquidWater.getDensity(), massFlow);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class FlowOfLiquidWater implements Flow<LiquidWater> {
     public static FlowOfLiquidWater of(LiquidWater liquidWater, VolumetricFlow volFlow) {
         CommonValidators.requireNotNull(liquidWater);
         CommonValidators.requireNotNull(volFlow);
-        MassFlow massFlow = FlowEquations.volFlowToMassFlow(liquidWater.getDensity(), volFlow);
+        MassFlow massFlow = FlowEquations.massFlowFromVolFlow(liquidWater.getDensity(), volFlow);
         return new FlowOfLiquidWater(liquidWater, massFlow);
     }
 

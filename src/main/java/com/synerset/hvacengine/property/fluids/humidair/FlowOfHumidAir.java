@@ -37,8 +37,8 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
         CommonValidators.requireBetweenBoundsInclusive(massFlowHa, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         this.humidAir = humidAir;
         this.massFlow = massFlowHa;
-        this.volFlow = FlowEquations.massFlowToVolFlow(humidAir.getDensity(), massFlowHa).toCubicMetersPerHour();
-        MassFlow massFlowDa = FlowEquations.massFlowHaToMassFlowDa(humidAir.getHumidityRatio(), massFlowHa);
+        this.volFlow = FlowEquations.volFlowFromMassFlow(humidAir.getDensity(), massFlowHa);
+        MassFlow massFlowDa = FlowEquations.massFlowDaFromMassFlowHa(humidAir.getHumidityRatio(), massFlowHa);
         this.flowOfDryAir = FlowOfDryAir.of(DryAir.of(humidAir.getTemperature()), massFlowDa);
     }
 
@@ -135,13 +135,28 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
     }
 
     /**
+     * Create a new `FlowOfHumidAir` instance with the specified dry air flow rate.
+     *
+     * @param dryAirFlow The dry air flow component of humid air in appropriate units.
+     * @return A new `FlowOfHumidAir` instance.
+     */
+    public FlowOfHumidAir withDryAirFlow(MassFlow dryAirFlow) {
+        return FlowOfHumidAir.ofDryAirMassFlow(humidAir, dryAirFlow);
+    }
+
+    /**
      * Create a new `FlowOfHumidAir` instance with the specified humid air.
      *
      * @param humidAir The humid air associated with the flow.
      * @return A new `FlowOfHumidAir` instance.
      */
-    public FlowOfHumidAir withHumidAir(HumidAir humidAir) {
-        return FlowOfHumidAir.of(humidAir, massFlow);
+    public FlowOfHumidAir withHumidAirFixedDryAirMassFlow(HumidAir humidAir) {
+        return FlowOfHumidAir.ofDryAirMassFlow(humidAir, flowOfDryAir.getMassFlow());
+    }
+
+    public FlowOfHumidAir withTemperature(Temperature temperature) {
+        HumidAir newHumidAir = humidAir.withDryBulbTemperature(temperature);
+        return withHumidAirFixedDryAirMassFlow(newHumidAir);
     }
 
     @Override
@@ -205,7 +220,7 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
     public static FlowOfHumidAir of(HumidAir humidAir, VolumetricFlow volFlowHa) {
         CommonValidators.requireNotNull(humidAir);
         CommonValidators.requireNotNull(volFlowHa);
-        return new FlowOfHumidAir(humidAir, FlowEquations.volFlowToMassFlow(humidAir.getDensity(), volFlowHa));
+        return new FlowOfHumidAir(humidAir, FlowEquations.massFlowFromVolFlow(humidAir.getDensity(), volFlowHa));
     }
 
     /**
@@ -220,7 +235,7 @@ public class FlowOfHumidAir implements Flow<HumidAir> {
         CommonValidators.requireNotNull(massFlowDa);
         CommonValidators.requireBetweenBoundsInclusive(massFlowDa, MASS_FLOW_MIN_LIMIT, MASS_FLOW_MAX_LIMIT);
         HumidityRatio humRatio = humidAir.getHumidityRatio();
-        MassFlow humidAirMassFlow = FlowEquations.massFlowDaToMassFlowHa(humRatio, massFlowDa);
+        MassFlow humidAirMassFlow = FlowEquations.massFlowHaFromMassFlowDa(humRatio, massFlowDa);
         return FlowOfHumidAir.of(humidAir, humidAirMassFlow);
     }
 

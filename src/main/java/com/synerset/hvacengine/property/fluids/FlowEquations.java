@@ -31,14 +31,14 @@ public final class FlowEquations {
      * @param massFlow mass flow rate in kg/s
      * @return volumetric flow rate in m3/s
      */
-    public static double massFlowToVolFlow(double density, double massFlow) {
+    public static double volFlowFromMassFlow(double density, double massFlow) {
         return massFlow / density;
     }
 
-    public static VolumetricFlow massFlowToVolFlow(Density density, MassFlow massFlow) {
+    public static VolumetricFlow volFlowFromMassFlow(Density density, MassFlow massFlow) {
         CommonValidators.requireNotNull(density);
         CommonValidators.requireNotNull(massFlow);
-        double volFlowVal = massFlowToVolFlow(density.getInKilogramsPerCubicMeters(), massFlow.getInKilogramsPerSecond());
+        double volFlowVal = volFlowFromMassFlow(density.getInKilogramsPerCubicMeters(), massFlow.getInKilogramsPerSecond());
         return VolumetricFlow.ofCubicMetersPerSecond(volFlowVal);
     }
 
@@ -49,14 +49,14 @@ public final class FlowEquations {
      * @param volFlow volumetric flow rate in m3/s
      * @return mass flow rate in kg/s
      */
-    public static double volFlowToMassFlow(double density, double volFlow) {
+    public static double massFlowFromVolFlow(double density, double volFlow) {
         return volFlow * density;
     }
 
-    public static MassFlow volFlowToMassFlow(Density density, VolumetricFlow volFlow) {
+    public static MassFlow massFlowFromVolFlow(Density density, VolumetricFlow volFlow) {
         CommonValidators.requireNotNull(density);
         CommonValidators.requireNotNull(volFlow);
-        double massFlowVal = volFlowToMassFlow(density.getInKilogramsPerCubicMeters(), volFlow.getInCubicMetersPerSecond());
+        double massFlowVal = massFlowFromVolFlow(density.getInKilogramsPerCubicMeters(), volFlow.getInCubicMetersPerSecond());
         return MassFlow.ofKilogramsPerSecond(massFlowVal);
     }
 
@@ -70,14 +70,14 @@ public final class FlowEquations {
      * @param massFlowHa    moist air flow in kg/s
      * @return dry air flow in kg/s
      */
-    public static double massFlowHaToMassFlowDa(double humidityRatio, double massFlowHa) {
+    public static double massFlowDaFromMassFlowHa(double humidityRatio, double massFlowHa) {
         return massFlowHa / (1.0 + humidityRatio);
     }
 
-    public static MassFlow massFlowHaToMassFlowDa(HumidityRatio humRatio, MassFlow massFlowHa) {
+    public static MassFlow massFlowDaFromMassFlowHa(HumidityRatio humRatio, MassFlow massFlowHa) {
         CommonValidators.requireNotNull(humRatio);
         CommonValidators.requireNotNull(massFlowHa);
-        double massFlowVal = massFlowHaToMassFlowDa(humRatio.getInKilogramPerKilogram(),
+        double massFlowVal = massFlowDaFromMassFlowHa(humRatio.getInKilogramPerKilogram(),
                 massFlowHa.getInKilogramsPerSecond());
         return MassFlow.ofKilogramsPerSecond(massFlowVal);
     }
@@ -90,14 +90,14 @@ public final class FlowEquations {
      * @param massFlowDa    dry air mass flow in kg/s
      * @return moist air mass flow in kg/s
      */
-    public static double massFlowDaToMassFlowHa(double humidityRatio, double massFlowDa) {
+    public static double massFlowHaFromMassFlowDa(double humidityRatio, double massFlowDa) {
         return massFlowDa * (1.0 + humidityRatio);
     }
 
-    public static MassFlow massFlowDaToMassFlowHa(HumidityRatio humRatio, MassFlow massFlowDa) {
+    public static MassFlow massFlowHaFromMassFlowDa(HumidityRatio humRatio, MassFlow massFlowDa) {
         CommonValidators.requireNotNull(humRatio);
         CommonValidators.requireNotNull(massFlowDa);
-        double massFlowVal = massFlowDaToMassFlowHa(humRatio.getInKilogramPerKilogram(),
+        double massFlowVal = massFlowHaFromMassFlowDa(humRatio.getInKilogramPerKilogram(),
                 massFlowDa.getInKilogramsPerSecond());
         return MassFlow.ofKilogramsPerSecond(massFlowVal);
     }
@@ -110,16 +110,16 @@ public final class FlowEquations {
      * @param massFlowDa        dry air mass flow in kg/s
      * @return moist air volumetric flow in m3/s
      */
-    public static double massFlowDaToVolFlowHa(double densityOfMoistAir, double humidityRatio, double massFlowDa) {
-        double massFlowMa = massFlowDaToMassFlowHa(humidityRatio, massFlowDa);
-        return massFlowToVolFlow(densityOfMoistAir, massFlowMa);
+    public static double volFlowHaFromMassFlowDa(double densityOfMoistAir, double humidityRatio, double massFlowDa) {
+        double massFlowMa = massFlowHaFromMassFlowDa(humidityRatio, massFlowDa);
+        return volFlowFromMassFlow(densityOfMoistAir, massFlowMa);
     }
 
-    public static MassFlow massFlowDaToVolFlowHa(Density density, HumidityRatio humRatio, MassFlow massFlowDa) {
+    public static MassFlow volFlowHaFromMassFlowDa(Density density, HumidityRatio humRatio, MassFlow massFlowDa) {
         CommonValidators.requireNotNull(density);
         CommonValidators.requireNotNull(humRatio);
         CommonValidators.requireNotNull(massFlowDa);
-        double massFlowVal = massFlowDaToVolFlowHa(density.getInKilogramsPerCubicMeters(),
+        double massFlowVal = volFlowHaFromMassFlowDa(density.getInKilogramsPerCubicMeters(),
                 humRatio.getInKilogramPerKilogram(),
                 massFlowDa.getInKilogramsPerSecond());
         return MassFlow.ofKilogramsPerSecond(massFlowVal);
@@ -133,16 +133,16 @@ public final class FlowEquations {
      * @param volFlowHa         moist air volumetric flow in m3/s
      * @return moist air volumetric flow in m3/s
      */
-    public static double volFlowHaToMassFlowDa(double densityOfMoistAir, double humidityRatio, double volFlowHa) {
-        double massFlowMa = volFlowToMassFlow(densityOfMoistAir, volFlowHa);
-        return massFlowHaToMassFlowDa(humidityRatio, massFlowMa);
+    public static double massFlowDaFromVolFlowHa(double densityOfMoistAir, double humidityRatio, double volFlowHa) {
+        double massFlowMa = massFlowFromVolFlow(densityOfMoistAir, volFlowHa);
+        return massFlowDaFromMassFlowHa(humidityRatio, massFlowMa);
     }
 
-    public static MassFlow volFlowHaToMassFlowDa(Density density, HumidityRatio humRatio, VolumetricFlow volFlowHa) {
+    public static MassFlow massFlowDaFromVolFlowHa(Density density, HumidityRatio humRatio, VolumetricFlow volFlowHa) {
         CommonValidators.requireNotNull(density);
         CommonValidators.requireNotNull(humRatio);
         CommonValidators.requireNotNull(volFlowHa);
-        double massFlowVal = volFlowHaToMassFlowDa(density.getInKilogramsPerCubicMeters(),
+        double massFlowVal = massFlowDaFromVolFlowHa(density.getInKilogramsPerCubicMeters(),
                 humRatio.getInKilogramPerKilogram(),
                 volFlowHa.getInCubicMetersPerSecond());
         return MassFlow.ofKilogramsPerSecond(massFlowVal);

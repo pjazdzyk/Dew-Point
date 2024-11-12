@@ -37,7 +37,7 @@ class CoolingBlockTest {
     private static final SimpleDataSource<FlowOfHumidAir> TEST_INLET_FLOW_SOURCE = SimpleDataSource.of(TEST_INLET_AIR_FLOW);
 
     @Test
-    @DisplayName("Cooling node: should heat up inlet air when target temperature is given")
+    @DisplayName("Cooling node: should cool air inlet air when target temperature is given")
     void shouldCoolInletAirWhenTargetTemperatureIsGiven() {
         // Given
         CoolantData coolantData = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
@@ -83,7 +83,7 @@ class CoolingBlockTest {
     }
 
     @Test
-    @DisplayName("Cooling node: should heat up inlet air when heating power is given")
+    @DisplayName("Cooling node: should cool air inlet air when heating power is given")
     void shouldHCoolInletAirWhenInputPowerIsGiven() {
         // Given
         Power inputPower = Power.ofKiloWatts(-73.89739524318315).toWatts();
@@ -128,7 +128,7 @@ class CoolingBlockTest {
     }
 
     @Test
-    @DisplayName("Cooling node: should heat up inlet air when target relative humidity is given")
+    @DisplayName("Cooling node: should cool air inlet air when target relative humidity is given")
     void shouldCoolInletAirWhenTargetRelativeHumidityIsGiven() {
         // Given
         CoolantData coolantData = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
@@ -170,6 +170,25 @@ class CoolingBlockTest {
         assertThat(condensateFlow.getTemperature()).isEqualTo(coolantData.getAverageTemperature());
         assertThat(condensateFlow.getMassFlow().getValue()).isEqualTo(expectedCondensateFlow.getValue(), withPrecision(1E-11));
         assertThat(condensateFlow.getSpecificEnthalpy()).isEqualTo(LiquidWaterEquations.specificEnthalpy(coolantData.getAverageTemperature()));
+    }
+
+    @Test
+    @DisplayName("Cooling node: should cool inlet air, but for unrealistic cooling power, algorithm should fall back to temperature of the coil wall")
+    void shouldCoolInletAirButForToLargePowerShouldFallBackToCoilWallTemp() {
+        // Given
+        Power inputPower = Power.ofKiloWatts(-200).toWatts();
+        SimpleDataSource<Power> powerDataSource = SimpleDataSource.of(inputPower);
+
+        CoolantData coolantData = CoolantData.of(Temperature.ofCelsius(9), Temperature.ofCelsius(14));
+        SimpleDataSource<CoolantData> coolantDataSource = SimpleDataSource.of(coolantData);
+
+        // When
+        CoolingFromPower coolingFromPowerBlock = CoolingFromPower.of(TEST_INLET_FLOW_SOURCE, coolantDataSource, powerDataSource);
+        CoolingResult processResults = coolingFromPowerBlock.runProcessCalculations();
+
+        // Then
+        assertThat(processResults).isNotNull();
+        assertThat(processResults.outletAirFlow().getTemperature().getInCelsius()).isEqualTo(12.625);
     }
 
 }
