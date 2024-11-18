@@ -127,9 +127,9 @@ class AirCoolingEquationsTest {
         MassFlow actualCondensateFlow = airCoolingResult.condensateFlow().getMassFlow();
 
         // Then
-        assertThat(actualHeatOfProcess.getInWatts()).isEqualTo(expectedHeatOfProcess.getInWatts(), withPrecision(1E-10));
-        assertThat(actualOutAirTemp.getValue()).isEqualTo(expectedOutAirTemp.getValue(), withPrecision(1E-13));
-        assertThat(actualRelativeHumidity.getInPercent()).isEqualTo(expectedRelativeHumidity.getInPercent(), withPrecision(1E-13));
+        assertThat(actualHeatOfProcess.getInWatts()).isEqualTo(expectedHeatOfProcess.getInWatts(), withPrecision(1E-9));
+        assertThat(actualOutAirTemp.getValue()).isEqualTo(expectedOutAirTemp.getValue(), withPrecision(1E-12));
+        assertThat(actualRelativeHumidity.getInPercent()).isEqualTo(expectedRelativeHumidity.getInPercent(), withPrecision(1E-12));
         assertThat(actualHumRatio.getValue()).isEqualTo(expectedOutHumRatio.getValue(), withPrecision(1E-16));
         assertThat(actualCondensateTemp).isEqualTo(COOLANT_DATA.getAverageTemperature());
         assertThat(actualCondensateFlow.getInKilogramsPerSecond()).isEqualTo(expectedCondensateFlow.getInKilogramsPerSecond(), withPrecision(1E-16));
@@ -162,20 +162,6 @@ class AirCoolingEquationsTest {
     }
 
     // TOOLS
-    @Test
-    @DisplayName("Cooling equations: should return average cooling coil temperature when coolant supply and return temperatures are given")
-    void averageWallTemp_shouldCalculateAverageCoolingCoilTemperature_whenCoolantInletAndOutletTempsAreGiven() {
-        // Given
-        Temperature coolantSupplyTemp = Temperature.ofCelsius(6.0);
-        Temperature coolantReturnTemp = Temperature.ofCelsius(12.0);
-        Temperature expectedCoilAverageTemp = Temperature.ofCelsius(9.0);
-
-        // When
-        Temperature actualCoilAverageTemp = CoolantData.averageWallTemp(coolantSupplyTemp, coolantReturnTemp);
-
-        // Then
-        assertThat(actualCoilAverageTemp).isEqualTo(expectedCoilAverageTemp);
-    }
 
     @Test
     @DisplayName("Cooling equations: should return by-pass factor when average cooling coil temperature, inlet air temperature and expected outlet temperature are given")

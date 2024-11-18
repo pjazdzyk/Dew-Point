@@ -26,7 +26,8 @@ import static com.synerset.hvacengine.process.cooling.CoolingValidators.*;
 
 public class CoolingEquations {
 
-    private static final double REALISTIC_POWER_FACTOR = 0.95;
+    private static final double REALISTIC_COOLING_FACTOR = 0.95;
+    private static final double REALISTIC_RH_LIMIT_VALUE = 98;
 
     private CoolingEquations() {
         throw new IllegalStateException("Utility class");
@@ -129,7 +130,7 @@ public class CoolingEquations {
         requireNotNull(inputPower);
         requireValidInputPowerForCooling(inputPower);
 
-        if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero()) {
+        if (inputPower.isCloseToZero() || inletAirFlow.getMassFlow().isCloseToZero() || inletCoolantData.getTemperatureDifference().isCloseToZero()) {
             LiquidWater condensate = LiquidWater.of(inletAirFlow.getTemperature());
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(inletCoolantData.getAverageTemperature(), inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
@@ -154,7 +155,7 @@ public class CoolingEquations {
 
         double acceptablePowerValueInKw = nearWallAir.getSpecificEnthalpy().minus(inletAir.getSpecificEnthalpy())
                                                   .getInKiloJoulesPerKiloGram()
-                                          * REALISTIC_POWER_FACTOR
+                                          * REALISTIC_COOLING_FACTOR
                                           * inletAirFlow.getDryAirMassFlow().getInKilogramsPerSecond();
         Power acceptablePower = Power.ofKiloWatts(acceptablePowerValueInKw);
 
@@ -200,6 +201,14 @@ public class CoolingEquations {
         // Determining Bypass Factor and direct near-wall contact airflow and bypassing airflow
         HumidAir inletHumidAir = inletAirFlow.getFluid();
         double tIn = inletHumidAir.getTemperature().getInCelsius();
+
+        // Defensive mechanism to prevent unphysical results, and to keep BF in reasonable limit.
+        Temperature minPossibleTargetTemp = inletCoolantData.getAverageTemperature()
+                .minus(inletAirFlow.getTemperature()).multiply(BypassFactor.BF_HVAC_MIN.getValue() * -1)
+                .plus(inletCoolantData.getAverageTemperature());
+
+        targetTemperature = targetTemperature.isLowerThan(minPossibleTargetTemp) ? minPossibleTargetTemp : targetTemperature;
+
         double tOut = targetTemperature.getInCelsius();
 
         double mCond = 0.0;
@@ -207,7 +216,7 @@ public class CoolingEquations {
         FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(liquidWater, MassFlow.ofKilogramsPerSecond(mCond));
         Temperature averageWallTemp = inletCoolantData.getAverageTemperature();
         BypassFactor bypassFactor = coilBypassFactor(averageWallTemp, inletHumidAir.getTemperature(), targetTemperature);
-        if (tOut == tIn || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (tOut == tIn || inletAirFlow.getMassFlow().isEqualZero() || inletCoolantData.getTemperatureDifference().isCloseToZero()) {
             return CoolingResult.builder()
                     .processMode(CoolingMode.FROM_TEMPERATURE)
                     .inletAirFlow(inletAirFlow)
@@ -299,15 +308,14 @@ public class CoolingEquations {
         requireNotNull(inletAirFlow);
         requireNotNull(inletCoolantData);
         requireNotNull(targetRelativeHumidity);
-        int stableSafeLimitOfHR = 98;
-        requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(stableSafeLimitOfHR));
+        requireBetweenBoundsInclusive(targetRelativeHumidity, RelativeHumidity.RH_MIN_LIMIT, RelativeHumidity.ofPercentage(REALISTIC_RH_LIMIT_VALUE));
         requireValidTargetRelativeHumidityForCooling(inletAirFlow.getRelativeHumidity(), targetRelativeHumidity);
 
         double pIn = inletAirFlow.getPressure().getInPascals();
 
         Temperature averageWallTemp = inletCoolantData.getAverageTemperature();
 
-        if (inletAirFlow.getRelativeHumidity().equals(targetRelativeHumidity) || inletAirFlow.getMassFlow().isEqualZero()) {
+        if (inletAirFlow.getRelativeHumidity().equals(targetRelativeHumidity) || inletAirFlow.getMassFlow().isEqualZero() || inletCoolantData.getTemperatureDifference().isCloseToZero()) {
             LiquidWater condensate = LiquidWater.of(inletAirFlow.getTemperature());
             FlowOfLiquidWater condensateFlow = FlowOfLiquidWater.of(condensate, MassFlow.ofKilogramsPerSecond(0.0));
             BypassFactor bypassFactor = coilBypassFactor(averageWallTemp, inletAirFlow.getTemperature(), inletAirFlow.getTemperature());
@@ -376,11 +384,13 @@ public class CoolingEquations {
     }
 
     public static MassFlow massFlowFromPower(LiquidWater inletWater, Temperature outletTemperature, Power power) {
-        SpecificHeat inletSpecificHeat = inletWater.getSpecificHeat();
-        SpecificHeat outletSpecificHeat = LiquidWaterEquations.specificHeat(outletTemperature);
+        SpecificHeat inletSpecificHeat = inletWater.getSpecificHeat().toJoulePerKiloGramKelvin();
+        SpecificHeat outletSpecificHeat = LiquidWaterEquations.specificHeat(outletTemperature.toCelsius()).toJoulePerKiloGramKelvin();
         SpecificHeat averageSpecificHeat = inletSpecificHeat.plus(outletSpecificHeat).div(2);
-        Temperature temperatureDifference = outletTemperature.minus(inletWater.getTemperature());
-        double massFlowValue = power.abs().div(averageSpecificHeat.multiply(temperatureDifference.getInCelsius()));
+        Temperature temperatureDifference = outletTemperature.toCelsius().minus(inletWater.getTemperature().toCelsius());
+
+        double massFlowValue = power.toWatts().abs()
+                .div(averageSpecificHeat.multiply(temperatureDifference.getInCelsius()));
         return MassFlow.ofKilogramsPerSecond(massFlowValue);
     }
 

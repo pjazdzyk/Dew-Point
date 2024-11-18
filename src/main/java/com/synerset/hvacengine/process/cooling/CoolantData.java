@@ -14,6 +14,7 @@ public class CoolantData {
     private final Temperature supplyTemperature;
     private final Temperature returnTemperature;
     private final Temperature averageTemperature;
+    private final Temperature temperatureDifference;
 
     public CoolantData(Temperature supplyTemperature, Temperature returnTemperature) {
         CommonValidators.requireNotNull(supplyTemperature);
@@ -24,6 +25,7 @@ public class CoolantData {
         this.supplyTemperature = supplyTemperature;
         this.returnTemperature = returnTemperature;
         this.averageTemperature = averageWallTemp(supplyTemperature, returnTemperature);
+        this.temperatureDifference = returnTemperature.minus(supplyTemperature);
     }
 
     public Temperature getSupplyTemperature() {
@@ -38,7 +40,11 @@ public class CoolantData {
         return averageTemperature;
     }
 
-    public static Temperature averageWallTemp(Temperature supplyTemp, Temperature returnTemp) {
+    public Temperature getTemperatureDifference() {
+        return temperatureDifference;
+    }
+
+    private Temperature averageWallTemp(Temperature supplyTemp, Temperature returnTemp) {
         double averageTempVal = MathUtils.arithmeticAverage(supplyTemp.getInCelsius(), returnTemp.getInCelsius());
         return Temperature.ofCelsius(averageTempVal);
     }
