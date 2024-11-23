@@ -607,6 +607,7 @@ public final class HumidAirEquations {
      */
     public static double dryBulbTemperatureIX(double ix, double x, double pat) {
         BrentSolver solver = BrentSolver.of("T_IX_SOLVER");
+        solver.setEvalCycles(30);
         solver.setEvalDividerX2(2);
         solver.setEvalDividerX2Value(5);
         return solver.findRoot(tx -> ix - HumidAirEquations.specificEnthalpy(tx, x, pat));
