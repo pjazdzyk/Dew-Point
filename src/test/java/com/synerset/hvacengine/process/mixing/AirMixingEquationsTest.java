@@ -4,6 +4,7 @@ import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
+import com.synerset.unitility.unitsystem.common.Ratio;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -58,6 +59,7 @@ class AirMixingEquationsTest {
         assertThat(actualOutDryAirMassFlow.getInKilogramsPerSecond()).isEqualTo(mda_out);
         assertThat(actualOutHumidityRatio).isEqualTo(expectedHumidityRatio);
         assertThat(actualOutAirTemp).isEqualTo(expectedOutTemp);
+        assertThat(mixingResult.freshAirRatio()).isEqualTo(Ratio.ofPercentage(50));
     }
 
     @Test
@@ -65,24 +67,24 @@ class AirMixingEquationsTest {
     void mixMultipleHumidAirFlows_shouldMixMultipleFlowsTogether() {
         // Given
         FlowOfHumidAir inletFlow = FlowOfHumidAir.ofValues(-20, 99, 1000);
-        FlowOfHumidAir recircFlow_1 = FlowOfHumidAir.ofValues(0, 80, 1000);
-        FlowOfHumidAir recircFlow_2 = FlowOfHumidAir.ofValues(20, 50, 1000);
+        FlowOfHumidAir recircFlow1 = FlowOfHumidAir.ofValues(0, 80, 1000);
+        FlowOfHumidAir recircFlow2 = FlowOfHumidAir.ofValues(20, 50, 1000);
         Temperature expectedTemp = Temperature.ofCelsius(-1.0000413789265845);
         RelativeHumidity expectedRH = RelativeHumidity.ofPercentage(99.48335594756662);
         MassFlow expectedDryAirMassFlow = MassFlow.ofKilogramsPerSecond(inletFlow.getDryAirMassFlow()
-                .plus(recircFlow_1.getDryAirMassFlow())
-                .plus(recircFlow_2.getDryAirMassFlow())
+                .plus(recircFlow1.getDryAirMassFlow())
+                .plus(recircFlow2.getDryAirMassFlow())
                 .getValue());
 
         // When
-        MixingResult mixingResult = MixingEquations.mixingOfMultipleFlows(inletFlow, recircFlow_1, recircFlow_2);
+        MixingResult mixingResult = MixingEquations.mixingOfMultipleFlows(inletFlow, recircFlow1, recircFlow2);
         FlowOfHumidAir actualOutletFlow = mixingResult.outletAirFlow();
 
         // Then
         assertThat(actualOutletFlow.getTemperature()).isEqualTo(expectedTemp);
         assertThat(actualOutletFlow.getRelativeHumidity().getInPercent()).isEqualTo(expectedRH.getInPercent(), withPrecision(1E-11));
         assertThat(actualOutletFlow.getDryAirMassFlow()).isEqualTo(expectedDryAirMassFlow);
-
+        assertThat(mixingResult.freshAirRatio()).isEqualTo(Ratio.ofPercentage(36.10289482757949));
     }
 
 }

@@ -5,6 +5,7 @@ import com.synerset.hvacengine.process.ProcessResult;
 import com.synerset.hvacengine.process.ProcessType;
 import com.synerset.hvacengine.process.mixing.MixingMode;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
+import com.synerset.unitility.unitsystem.common.Ratio;
 import com.synerset.unitility.unitsystem.thermodynamic.Power;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public record MixingResult(ProcessType processType,
                            FlowOfHumidAir inletAirFlow,
                            FlowOfHumidAir outletAirFlow,
                            Power heatOfProcess,
+                           Ratio freshAirRatio,
                            Collection<FlowOfHumidAir> recirculationFlows) implements ProcessResult {
 
     @Override
@@ -31,6 +33,7 @@ public record MixingResult(ProcessType processType,
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess = Power.ofWatts(0);
+        private Ratio freshAirRatio = Ratio.ofPercentage(0);
         private Collection<FlowOfHumidAir> recirculationFlows;
 
         public AirMixingResultBuilder() {
@@ -62,8 +65,13 @@ public record MixingResult(ProcessType processType,
             return this;
         }
 
+        public AirMixingResultBuilder freshAirRatio(Ratio freshAirRatio) {
+            this.freshAirRatio = freshAirRatio;
+            return this;
+        }
+
         public MixingResult build() {
-            return new MixingResult(processType, processMode, inletAirFlow, outletAirFlow, heatOfProcess, recirculationFlows);
+            return new MixingResult(processType, processMode, inletAirFlow, outletAirFlow, heatOfProcess, freshAirRatio, recirculationFlows);
         }
     }
 

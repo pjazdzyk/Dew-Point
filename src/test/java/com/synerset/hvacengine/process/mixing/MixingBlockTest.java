@@ -5,6 +5,7 @@ import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.hvacengine.process.source.SimpleDataSource;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
+import com.synerset.unitility.unitsystem.common.Ratio;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
@@ -67,6 +68,7 @@ class MixingBlockTest {
         assertThat(actualMixingFlows).hasSize(1);
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
         assertThat(processResults.processMode()).isEqualTo(MixingMode.SIMPLE_MIXING);
+        assertThat(processResults.freshAirRatio()).isEqualTo(Ratio.ofPercentage(40.11989227594873));
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(inletAir.getPressure());
@@ -127,7 +129,7 @@ class MixingBlockTest {
         MixingResult processResults = mixingBlock.runProcessCalculations();
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
         assertThat(processResults.processMode()).isEqualTo(MixingMode.MULTIPLE_MIXING);
-
+        assertThat(processResults.freshAirRatio()).isEqualTo(Ratio.ofPercentage(33.40744717861534));
         // Then
         assertThat(processResults).isNotNull();
         assertThat(processResults.outletAirFlow()).isNotNull();

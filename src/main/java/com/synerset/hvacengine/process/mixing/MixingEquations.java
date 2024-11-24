@@ -5,6 +5,7 @@ import com.synerset.hvacengine.process.mixing.dataobject.MixingResult;
 import com.synerset.hvacengine.property.fluids.humidair.FlowOfHumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAir;
 import com.synerset.hvacengine.property.fluids.humidair.HumidAirEquations;
+import com.synerset.unitility.unitsystem.common.Ratio;
 import com.synerset.unitility.unitsystem.flow.MassFlow;
 import com.synerset.unitility.unitsystem.humidity.HumidityRatio;
 import com.synerset.unitility.unitsystem.thermodynamic.Pressure;
@@ -35,6 +36,7 @@ public class MixingEquations {
                     .processMode(MixingMode.SIMPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
+                    .freshAirRatio(Ratio.ofPercentage(100))
                     .recirculationFlows(List.of(recirculationAirFlow))
                     .build();
         }
@@ -55,10 +57,13 @@ public class MixingEquations {
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
+        Ratio freshAirRatio = Ratio.ofPercentage((mdaIn / mdaOut) * 100);
+
         return MixingResult.builder()
                 .processMode(MixingMode.SIMPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
+                .freshAirRatio(freshAirRatio)
                 .recirculationFlows(List.of(recirculationAirFlow))
                 .build();
     }
@@ -71,6 +76,7 @@ public class MixingEquations {
                     .processMode(MixingMode.MULTIPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
+                    .freshAirRatio(Ratio.ofPercentage(100))
                     .recirculationFlows(recirculationAirFlows)
                     .build();
         }
@@ -100,10 +106,13 @@ public class MixingEquations {
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
+        Ratio freshAirRatio = Ratio.ofPercentage((inletAir.getDryAirMassFlow().getInKilogramsPerSecond() / mdaOut) * 100);
+
         return MixingResult.builder()
                 .processMode(MixingMode.MULTIPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
+                .freshAirRatio(freshAirRatio)
                 .recirculationFlows(recirculationAirFlows)
                 .build();
     }
