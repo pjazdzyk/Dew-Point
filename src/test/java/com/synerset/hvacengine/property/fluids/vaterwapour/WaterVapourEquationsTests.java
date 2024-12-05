@@ -1,5 +1,6 @@
 package com.synerset.hvacengine.property.fluids.vaterwapour;
 
+import com.synerset.hvacengine.property.fluids.liquidwater.LiquidWaterEquations;
 import com.synerset.hvacengine.property.fluids.watervapour.WaterVapourEquations;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.Density;
@@ -13,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withPrecision;
 
@@ -108,13 +110,28 @@ class WaterVapourEquationsTests {
     void specificEnthalpy_shouldReturnWaterVapourSpecificEnthalpy_whenAirTemperatureIsGiven() {
         // Arrange
         var ta = 20.0;
-        var expectedWvSpecificEnthalpy = 2538.155121040328;
+        var expectedWvSpecificEnthalpy = 2538.153413040328;
 
         //Act
         var actualWvSpecificEnthalpy = WaterVapourEquations.specificEnthalpy(ta);
 
         // Assert
         assertThat(expectedWvSpecificEnthalpy).isEqualTo(actualWvSpecificEnthalpy, withPrecision(MATH_ACCURACY));
+    }
+
+    @Test
+    @DisplayName("should return water vapour heat of condensation when temperature and pressure is given")
+    void heatOfCondensation_shouldReturnHeatOfCondensation_whenTemperatureAndPressureIsGiven(){
+        // Given
+        var expectedR = LiquidWaterEquations.HEAT_OF_WATER_VAPORIZATION;
+        var tx = 0;
+        var px = Pressure.STANDARD_ATMOSPHERE.getInPascals();
+
+        // When
+        double r = WaterVapourEquations.heatOfCondensation(px, tx);
+
+        // Then
+        assertThat(r).isEqualTo(expectedR, withPrecision(MATH_ACCURACY));
     }
 
     @Test

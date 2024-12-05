@@ -325,10 +325,10 @@ class HumidAirEquationsTest {
         var ta2 = -20.0;
         var x3 = 0.0001532;     // unsaturated for -20oC
 
-        var expectedEnthalpyUnsaturated = 38.4012926032259;
-        var expectedEnthalpyWithWaterMist = 58.32618455095958;
-        var expectedEnthalpyWithIceMist = -25.69550793501464;
-        var expectedEnthalpyUnsaturatedNegative = -19.68254341443484;
+        var expectedEnthalpyUnsaturated = 38.4012802835927;
+        var expectedEnthalpyWithWaterMist = 58.32615911077926;
+        var expectedEnthalpyWithIceMist = -25.695509033086726;
+        var expectedEnthalpyUnsaturatedNegative = -19.682543676100437;
 
         //Act
         var actualEnthalpyUnsaturated = HumidAirEquations.specificEnthalpy(ta1, x1, PHYS_ATMOSPHERE);

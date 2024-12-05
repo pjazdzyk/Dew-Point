@@ -255,10 +255,8 @@ public class CoolingEquations {
                 .getInKilogramsPerSecond();
 
         // Determining required cooling performance
-        double iCond = LiquidWaterEquations.specificEnthalpy(tCond);
         double iIn = inletHumidAir.getSpecificEnthalpy().getInKiloJoulesPerKiloGram();
-        double qCond = mCond * iCond;
-        double qCool = (mDaDirectContact * (iTm - iIn) + qCond);
+        double qCool = (mDaDirectContact * (iTm - iIn));
 
         // Determining an outlet humidity ratio
         double xOut = (xTm * mDaDirectContact + xIn * mDaBypassing) / mdaIn;

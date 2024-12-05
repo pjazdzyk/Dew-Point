@@ -87,7 +87,7 @@ class AirCoolingEquationsTest {
         Temperature expectedOutAirTemp = Temperature.ofCelsius(17.0);
 
         HumidityRatio expectedOutHumRatio = HumidityRatio.ofKilogramPerKilogram(0.009772748723824064);
-        Power expectedHeatOfProcess = Power.ofWatts(-26835.191594387037);
+        Power expectedHeatOfProcess = Power.ofWatts(-27016.52106432564);
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
@@ -114,7 +114,7 @@ class AirCoolingEquationsTest {
 
         Temperature expectedOutAirTemp = Temperature.ofCelsius(17.0);
         HumidityRatio expectedOutHumRatio = HumidityRatio.ofKilogramPerKilogram(0.009772748723824064);
-        Power expectedHeatOfProcess = Power.ofWatts(-26835.191594387037);
+        Power expectedHeatOfProcess = Power.ofWatts(-27016.521064325912);
         MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
 
         // When
@@ -139,11 +139,11 @@ class AirCoolingEquationsTest {
     @DisplayName("Cooling equations: should cool down inlet air when input heat and average wall temperature of cooling coil is given")
     void processOfRealCooling_shouldCoolDownInletAir_whenHeatOfProcessIsGiven() {
         // Given
-        Power expectedHeatOfProcess = Power.ofWatts(-26835.191594387037);
+        Power expectedHeatOfProcess = Power.ofWatts(-27016.521064325912);
 
         Temperature expectedOutAirTemp = Temperature.ofCelsius(17.0);
-        HumidityRatio expectedOutHumRatio = HumidityRatio.ofKilogramPerKilogram(0.009772748723824064);
-        MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.0037604402299109005);
+        HumidityRatio expectedOutHumRatio = HumidityRatio.ofKilogramPerKilogram(0.009772748723824026);
+        MassFlow expectedCondensateFlow = MassFlow.ofKilogramsPerSecond(0.003760440229910938);
 
         // When
         CoolingResult airCoolingResult = CoolingEquations.coolingFromPower(inletFlow, COOLANT_DATA, expectedHeatOfProcess);
@@ -155,7 +155,7 @@ class AirCoolingEquationsTest {
 
         // Then
         assertThat(actualHeatOfProcess).isEqualTo(expectedHeatOfProcess);
-        assertThat(actualOutAirTemp).isEqualTo(expectedOutAirTemp);
+        assertThat(actualOutAirTemp.getValue()).isEqualTo(expectedOutAirTemp.getValue(), withPrecision(1E-12));
         assertThat(actualHumRatio).isEqualTo(expectedOutHumRatio);
         assertThat(actualCondensateTemp).isEqualTo(COOLANT_DATA.getAverageTemperature());
         assertThat(actualCondensateFlow).isEqualTo(expectedCondensateFlow);

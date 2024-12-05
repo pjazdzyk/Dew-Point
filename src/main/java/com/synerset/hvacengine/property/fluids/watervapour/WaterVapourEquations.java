@@ -6,6 +6,8 @@ import com.synerset.hvacengine.property.fluids.liquidwater.LiquidWaterEquations;
 import com.synerset.unitility.unitsystem.humidity.RelativeHumidity;
 import com.synerset.unitility.unitsystem.thermodynamic.*;
 
+import static com.synerset.hvacengine.property.fluids.liquidwater.LiquidWaterEquations.HEAT_OF_WATER_VAPORIZATION;
+
 public final class WaterVapourEquations {
 
     public static final double WATER_VAPOUR_MOLECULAR_MASS = 18.01528;     // [kg/mol]   Water vapour molecular mass
@@ -85,7 +87,7 @@ public final class WaterVapourEquations {
      */
     public static double specificEnthalpy(double tw) {
         double cpWv = specificHeat(tw);
-        return cpWv * tw + LiquidWaterEquations.HEAT_OF_WATER_VAPORIZATION;
+        return cpWv * tw + HEAT_OF_WATER_VAPORIZATION;
     }
 
     public static SpecificEnthalpy specificEnthalpy(Temperature temperature) {
@@ -174,6 +176,25 @@ public final class WaterVapourEquations {
         double densityVal = density(temperature.getInCelsius(),
                 pressure.getInPascals());
         return Density.ofKilogramPerCubicMeter(densityVal);
+    }
+
+    public static SpecificEnthalpy heatOfCondensation(Pressure pressure, Temperature temperature){
+        double r = heatOfCondensation(pressure.getInPascals(), temperature.getInCelsius());
+        return SpecificEnthalpy.ofKiloJoulePerKiloGram(r);
+    }
+
+    /**
+     * Returns heat of water vapour condensation, kJ/kg
+     *
+     * @param p  absolute pressure, oC
+     * @param tx temperature, Pa
+     * @return heat of water vapour condensation, kJ/kg
+     */
+    public static double heatOfCondensation(double p, double tx) {
+        double ro = HEAT_OF_WATER_VAPORIZATION;
+        double t = tx;
+        double po = Pressure.STANDARD_ATMOSPHERE.getInPascals();
+        return (ro - 2.36 * t) * (1 + 0.01 * Math.log(p / po));
     }
 
 }
