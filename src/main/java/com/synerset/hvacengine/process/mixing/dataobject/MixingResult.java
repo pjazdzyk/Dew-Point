@@ -19,7 +19,8 @@ public record MixingResult(ProcessType processType,
                            FlowOfHumidAir inletAirFlow,
                            FlowOfHumidAir outletAirFlow,
                            Power heatOfProcess,
-                           Ratio freshAirRatio,
+                           Ratio dryAirMassFreshAirRatio,
+                           Ratio humidAirVolFreshAirRatio,
                            Collection<FlowOfHumidAir> recirculationFlows) implements ProcessResult {
 
     @Override
@@ -33,7 +34,8 @@ public record MixingResult(ProcessType processType,
         private FlowOfHumidAir inletAirFlow;
         private FlowOfHumidAir outletAirFlow;
         private Power heatOfProcess = Power.ofWatts(0);
-        private Ratio freshAirRatio = Ratio.ofPercentage(0);
+        private Ratio dryAirMassFreshAirRatio = Ratio.ofPercentage(0);
+        private Ratio humidAirVolFreshAirRatio = Ratio.ofPercentage(0);
         private Collection<FlowOfHumidAir> recirculationFlows;
 
         public AirMixingResultBuilder() {
@@ -65,13 +67,18 @@ public record MixingResult(ProcessType processType,
             return this;
         }
 
-        public AirMixingResultBuilder freshAirRatio(Ratio freshAirRatio) {
-            this.freshAirRatio = freshAirRatio;
+        public AirMixingResultBuilder dryAirMassFreshAirRatio(Ratio dryAirMassFreshAirRatio) {
+            this.dryAirMassFreshAirRatio = dryAirMassFreshAirRatio;
+            return this;
+        }
+
+        public AirMixingResultBuilder humidAirVolFreshAirRatio(Ratio humidAirVolFreshAirRatio) {
+            this.humidAirVolFreshAirRatio = humidAirVolFreshAirRatio;
             return this;
         }
 
         public MixingResult build() {
-            return new MixingResult(processType, processMode, inletAirFlow, outletAirFlow, heatOfProcess, freshAirRatio, recirculationFlows);
+            return new MixingResult(processType, processMode, inletAirFlow, outletAirFlow, heatOfProcess, dryAirMassFreshAirRatio, humidAirVolFreshAirRatio, recirculationFlows);
         }
     }
 

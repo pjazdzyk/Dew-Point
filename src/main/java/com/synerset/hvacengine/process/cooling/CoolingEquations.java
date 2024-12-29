@@ -19,6 +19,8 @@ import com.synerset.unitility.unitsystem.thermodynamic.Power;
 import com.synerset.unitility.unitsystem.thermodynamic.SpecificHeat;
 import com.synerset.unitility.unitsystem.thermodynamic.Temperature;
 
+import static com.synerset.hvacengine.common.SharedSettings.SHOW_SOLVER_DEBUG_LOGS;
+import static com.synerset.hvacengine.common.SharedSettings.SHOW_SOLVER_SUMMARY_LOG;
 import static com.synerset.hvacengine.common.validation.CommonValidators.requireAboveLowerBound;
 import static com.synerset.hvacengine.common.validation.CommonValidators.requireBetweenBoundsInclusive;
 import static com.synerset.hvacengine.common.validation.CommonValidators.requireNotNull;
@@ -79,7 +81,7 @@ public class CoolingEquations {
      *
      * @param inletAirFlow      the initial flow of humid air
      * @param targetTemperature the target temperature for cooling
-     * @return the result of dry cooling process
+     * @return the result of dry cooling process {@link DryCoolingResult}
      */
     public static DryCoolingResult dryCoolingFromTemperature(FlowOfHumidAir inletAirFlow, Temperature targetTemperature) {
         requireNotNull(inletAirFlow);
@@ -167,8 +169,10 @@ public class CoolingEquations {
         DryCoolingResult dryCooling = dryCoolingFromPower(inletAirFlow, powerForFurtherCalculations);
         double tmin = inletAirFlow.getTemperature().getInCelsius();
         double tmax = dryCooling.outletAirFlow().getTemperature().getInCelsius();
-        BrentSolver solver = BrentSolver.of("[CoolingFromPower]");
+        BrentSolver solver = BrentSolver.of("COOL_FROM_Q_SOLVER");
         solver.setCounterpartPoints(tmin, tmax);
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         CoolingResult[] coolingResults = new CoolingResult[1];
         solver.findRoot(outTemp -> {
             CoolingResult airCoolingResult = coolingFromTargetTemperature(inletAirFlow, inletCoolantData, Temperature.ofCelsius(outTemp));
@@ -181,7 +185,7 @@ public class CoolingEquations {
     }
 
     /**
-     * Real cooling coil process. Returns real cooling coil process result as double array, to achieve expected outlet
+     * Real cooling coil process. Returns real cooling coil process result as {@link CoolingResult}, to achieve expected outlet
      * temperature. This method represents real cooling coil, where additional energy is used to discharge more condensate
      * compared to ideal coil.
      * Results structure: {@link CoolingResult}
@@ -243,7 +247,7 @@ public class CoolingEquations {
         double tdpIn = inletHumidAir.getDewPointTemperature().getInCelsius();
         double psTm = HumidAirEquations.saturationPressure(tmWall);
         double xTm = tmWall >= tdpIn ? xIn : HumidAirEquations.maxHumidityRatio(psTm, pIn);
-        double iTm = HumidAirEquations.specificEnthalpy(tmWall, xTm, pIn);
+        double iTm = HumidAirEquations.specificEnthalpyFromPs(tmWall, xTm, pIn, psTm);
 
         // Determining condensate discharge and properties
         mCond = tmWall >= tdpIn
@@ -331,7 +335,9 @@ public class CoolingEquations {
         }
 
         // Iterative procedure to determine which outlet temperature will result in expected RH.
-        BrentSolver solver = BrentSolver.of("calcCoolingFromOutletRH SOLVER");
+        BrentSolver solver = BrentSolver.of("COOL_FROM_RH_SOLVER");
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         double tIn = inletAirFlow.getTemperature().getInCelsius();
         double tdpIn = inletAirFlow.getTemperature().getInCelsius();
         solver.setCounterpartPoints(tIn, tdpIn);

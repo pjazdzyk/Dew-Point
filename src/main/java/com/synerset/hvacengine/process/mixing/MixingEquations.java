@@ -36,7 +36,8 @@ public class MixingEquations {
                     .processMode(MixingMode.SIMPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
-                    .freshAirRatio(Ratio.ofPercentage(100))
+                    .dryAirMassFreshAirRatio(Ratio.ofPercentage(100))
+                    .humidAirVolFreshAirRatio(Ratio.ofPercentage(100))
                     .recirculationFlows(List.of(recirculationAirFlow))
                     .build();
         }
@@ -57,13 +58,15 @@ public class MixingEquations {
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
-        Ratio freshAirRatio = Ratio.ofPercentage((mdaIn / mdaOut) * 100);
+        Ratio dryAirMassFreshAirRatio = Ratio.ofPercentage((mdaIn / mdaOut) * 100);
+        Ratio humidAirVolFreshAirRatio = Ratio.from(inletAir.getVolFlow(), outletFlow.getVolFlow()).toPercent();
 
         return MixingResult.builder()
                 .processMode(MixingMode.SIMPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
-                .freshAirRatio(freshAirRatio)
+                .dryAirMassFreshAirRatio(dryAirMassFreshAirRatio)
+                .humidAirVolFreshAirRatio(humidAirVolFreshAirRatio)
                 .recirculationFlows(List.of(recirculationAirFlow))
                 .build();
     }
@@ -76,7 +79,8 @@ public class MixingEquations {
                     .processMode(MixingMode.MULTIPLE_MIXING)
                     .inletAirFlow(inletAir)
                     .outletAirFlow(inletAir)
-                    .freshAirRatio(Ratio.ofPercentage(100))
+                    .dryAirMassFreshAirRatio(Ratio.ofPercentage(100))
+                    .humidAirVolFreshAirRatio(Ratio.ofPercentage(100))
                     .recirculationFlows(recirculationAirFlows)
                     .build();
         }
@@ -106,13 +110,15 @@ public class MixingEquations {
 
         FlowOfHumidAir outletFlow = FlowOfHumidAir.ofDryAirMassFlow(outletHumidAir, MassFlow.ofKilogramsPerSecond(mdaOut));
 
-        Ratio freshAirRatio = Ratio.ofPercentage((inletAir.getDryAirMassFlow().getInKilogramsPerSecond() / mdaOut) * 100);
+        Ratio dryAirMassFlowFreshAirRatio = Ratio.ofPercentage((inletAir.getDryAirMassFlow().getInKilogramsPerSecond() / mdaOut) * 100);
+        Ratio humidAirVolFreshAirRatio = Ratio.from(inletAir.getVolFlow(), outletFlow.getVolFlow()).toPercent();
 
         return MixingResult.builder()
                 .processMode(MixingMode.MULTIPLE_MIXING)
                 .inletAirFlow(inletAir)
                 .outletAirFlow(outletFlow)
-                .freshAirRatio(freshAirRatio)
+                .dryAirMassFreshAirRatio(dryAirMassFlowFreshAirRatio)
+                .humidAirVolFreshAirRatio(humidAirVolFreshAirRatio)
                 .recirculationFlows(recirculationAirFlows)
                 .build();
     }

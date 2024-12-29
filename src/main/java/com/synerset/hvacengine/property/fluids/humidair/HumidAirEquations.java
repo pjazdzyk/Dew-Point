@@ -13,6 +13,9 @@ import com.synerset.unitility.unitsystem.thermodynamic.*;
 
 import java.util.function.DoubleUnaryOperator;
 
+import static com.synerset.hvacengine.common.SharedSettings.SHOW_SOLVER_DEBUG_LOGS;
+import static com.synerset.hvacengine.common.SharedSettings.SHOW_SOLVER_SUMMARY_LOG;
+
 /**
  * MOIST AIR PROPERTY EQUATIONS LIBRARY (psYCHROMETRICS)
  * Set of static methods for calculating temperature-dependent thermophysical air properties. Properties are calculated independently for dry air,
@@ -101,9 +104,11 @@ public final class HumidAirEquations {
         // Estimated saturation pressure for convergence speedup
         estimatedSatPressure = a * Math.exp(calcAlfaT(ta)) * 100.0;
 
-        BrentSolver solver = BrentSolver.of("P_SOLVER");
+        BrentSolver solver = BrentSolver.of("PS_SOLVER");
         solver.setEvalDividerX2(2);
         solver.setEvalDividerX2Value(5);
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         solver.setCounterpartPoints(estimatedSatPressure * SOLVER_A_COEF, estimatedSatPressure * SOLVER_B_COEF * n);
         expectedSatPressure = solver.findRoot(satPressureExpression);
         return expectedSatPressure;
@@ -150,6 +155,7 @@ public final class HumidAirEquations {
             return ta;
         if (rh == 0.0)
             return Double.NEGATIVE_INFINITY;
+
         // Arden-Buck procedure tdP estimation (used for rh>25)
         double tdpEstimated;
         double a, b, c, d;
@@ -168,24 +174,28 @@ public final class HumidAirEquations {
         bTrh = b - betaTrh;
         cTrh = -c * betaTrh;
         tdpEstimated = 1.0 / a * (bTrh - Math.sqrt(bTrh * bTrh + 2.0 * a * cTrh));
+
         if (rh < 25.0) {
             double ps = saturationPressure(ta);
             double x = humidityRatio(rh, ps, pat);
             BrentSolver solver = BrentSolver.of("T_SOLVER");
             solver.setEvalDividerX2(2);
             solver.setEvalDividerX2Value(5);
+            solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+            solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
             solver.setCounterpartPoints(tdpEstimated * SOLVER_A_COEF, tdpEstimated * SOLVER_B_COEF);
+
             if (rh < 1.0) {
                 solver.setAccuracy(0.0000001);
             }
-            double tdpExact = solver.findRoot(temp -> {
+
+            return solver.findRoot(temp -> {
                 double ps1 = saturationPressure(temp);
                 double x1 = maxHumidityRatio(ps1, pat);
                 return x1 - x;
-
             });
-            return tdpExact;
         }
+
         return tdpEstimated;
     }
 
@@ -218,15 +228,17 @@ public final class HumidAirEquations {
                               - 4.686035;
         double ps = saturationPressure(ta);
         double x = humidityRatio(rh, ps, pat);
-        double h = specificEnthalpy(ta, x, pat);
-        BrentSolver solver = BrentSolver.of("T_SOLVER");
+        double h = specificEnthalpyFromPs(ta, x, pat, ps);
+        BrentSolver solver = BrentSolver.of("WBT_SOLVER");
         solver.setEvalDividerX2(2);
         solver.setEvalDividerX2Value(5);
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         solver.setCounterpartPoints(estimatedWbt * SOLVER_A_COEF, estimatedWbt * SOLVER_B_COEF);
         return solver.findRoot(temp -> {
             double ps1 = saturationPressure(temp);
             double x1 = maxHumidityRatio(ps1, pat);
-            double h1 = specificEnthalpy(temp, x1, pat);
+            double h1 = specificEnthalpyFromPs(temp, x1, pat, ps1);
             double hw1;
             if (temp <= 0.0)
                 hw1 = IceEquations.specificEnthalpy(temp);
@@ -290,6 +302,32 @@ public final class HumidAirEquations {
         double relHumVal = relativeHumidity(dryBulbTemp.getInCelsius(),
                 humidityRatio.getInKilogramPerKilogram(),
                 absPressure.getInPascals());
+        return RelativeHumidity.ofPercentage(relHumVal);
+    }
+
+    /**
+     * Returns moist air relative humidity rh from saturation pressure <i>Ps</i> and humidity ratio <i>x</i>, %<p>
+     *
+     * @param x   relative humidity, kg.wv/kg.da
+     * @param pat atmospheric pressure, Pa
+     * @param ps  saturation pressure, Pa
+     * @return relative humidity, %
+     */
+    public static double relativeHumidityFromPs(double x, double pat, double ps) {
+        if (x == 0.0)
+            return 0.0;
+        double rh = x * pat / (WG_RATIO * ps + x * ps);
+        return rh > 1 ? 100 : rh * 100;
+    }
+
+    public static RelativeHumidity relativeHumidityFromPs(HumidityRatio humidityRatio, Pressure absPressure, Pressure satPressure) {
+        CommonValidators.requireNotNull(satPressure);
+        CommonValidators.requireNotNull(humidityRatio);
+        CommonValidators.requireNotNull(absPressure);
+        double relHumVal = relativeHumidityFromPs(
+                humidityRatio.getInKilogramPerKilogram(),
+                absPressure.getInPascals(),
+                satPressure.getInPascals());
         return RelativeHumidity.ofPercentage(relHumVal);
     }
 
@@ -475,6 +513,23 @@ public final class HumidAirEquations {
         return iDa + iWv + iWt + iIce;
     }
 
+    public static double specificEnthalpyFromPs(double ta, double x, double pat, double ps) {
+        double iDa = DryAirEquations.specificEnthalpy(ta);
+        // Case1: no humidity = dry air only
+        if (x == 0.0)
+            return iDa;
+        // Case2: x <= xMax, unsaturated air
+        double xMax = maxHumidityRatio(ps, pat);
+        double iWv = WaterVapourEquations.specificEnthalpy(ta) * x;
+        if (x <= xMax)
+            return iDa + iWv;
+        // Case3: x > XMax, saturated air with water or ice fog
+        iWv = WaterVapourEquations.specificEnthalpy(ta) * xMax;
+        double iWt = LiquidWaterEquations.specificEnthalpy(ta) * (x - xMax);
+        double iIce = IceEquations.specificEnthalpy(ta) * (x - xMax);
+        return iDa + iWv + iWt + iIce;
+    }
+
     public static SpecificEnthalpy specificEnthalpy(Temperature dryBulbTemp, HumidityRatio humRatio, Pressure absPressure) {
         CommonValidators.requireNotNull(dryBulbTemp);
         CommonValidators.requireNotNull(humRatio);
@@ -482,6 +537,18 @@ public final class HumidAirEquations {
         double specificEnthalpyVal = specificEnthalpy(dryBulbTemp.getInCelsius(),
                 humRatio.getInKilogramPerKilogram(),
                 absPressure.getInPascals());
+        return SpecificEnthalpy.ofKiloJoulePerKiloGram(specificEnthalpyVal);
+    }
+
+    public static SpecificEnthalpy specificEnthalpy(Temperature dryBulbTemp, HumidityRatio humRatio, Pressure absPressure, Pressure saturationPressure) {
+        CommonValidators.requireNotNull(dryBulbTemp);
+        CommonValidators.requireNotNull(humRatio);
+        CommonValidators.requireNotNull(absPressure);
+        CommonValidators.requireNotNull(saturationPressure);
+        double specificEnthalpyVal = specificEnthalpyFromPs(dryBulbTemp.getInCelsius(),
+                humRatio.getInKilogramPerKilogram(),
+                absPressure.getInPascals(),
+                saturationPressure.getInPascals());
         return SpecificEnthalpy.ofKiloJoulePerKiloGram(specificEnthalpyVal);
     }
 
@@ -557,6 +624,8 @@ public final class HumidAirEquations {
         //New instance of BrentSolver is required, to avoid clash between two methods using P_SOLVER
         //at the same time.
         BrentSolver solver = new BrentSolver();
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         solver.setCounterpartPoints(taEstimated * SOLVER_A_COEF, taEstimated * SOLVER_B_COEF);
         return solver.findRoot(temp -> tdp - dewPointTemperature(temp, rh, pat));
     }
@@ -583,6 +652,8 @@ public final class HumidAirEquations {
         BrentSolver solver = BrentSolver.of("T_Xrh_SOLVER");
         solver.setEvalDividerX2(2);
         solver.setEvalDividerX2Value(5);
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         return solver.findRoot(tx -> saturationPressure(x, rh, pat) - saturationPressure(tx));
     }
 
@@ -610,6 +681,8 @@ public final class HumidAirEquations {
         solver.setEvalCycles(30);
         solver.setEvalDividerX2(2);
         solver.setEvalDividerX2Value(5);
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         return solver.findRoot(tx -> ix - HumidAirEquations.specificEnthalpy(tx, x, pat));
     }
 
@@ -635,6 +708,8 @@ public final class HumidAirEquations {
      */
     public static double dryBulbTemperatureWbtRH(double wbt, double rh, double pat) {
         BrentSolver solver = BrentSolver.of("T_WbtRH_SOLVER");
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         return solver.findRoot(temp -> wbt - wetBulbTemperature(temp, rh, pat));
     }
 
@@ -657,6 +732,8 @@ public final class HumidAirEquations {
     public static double dryBulbTemperatureMax(double inPat) {
         double estimatedTa = -237300 * Math.log(0.001638 * inPat) / (1000 * Math.log(0.001638 * inPat) - 17269);
         BrentSolver solver = new BrentSolver();
+        solver.showDebugLogs(SHOW_SOLVER_DEBUG_LOGS);
+        solver.showSummaryLogs(SHOW_SOLVER_SUMMARY_LOG);
         solver.setCounterpartPoints(estimatedTa * SOLVER_A_COEF, estimatedTa * SOLVER_B_COEF * 1.5);
         return solver.findRoot(ta -> inPat - saturationPressure(ta));
     }

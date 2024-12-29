@@ -50,6 +50,20 @@ public class HumidAir implements Fluid {
     public HumidAir(Pressure pressure,
                     Temperature temperature,
                     HumidityRatio humidityRatio) {
+        this(pressure, temperature, humidityRatio, HumidAirEquations.saturationPressure(temperature));
+    }
+
+    /**
+     * Constructs a `HumidAir` instance with the specified absolute pressure, dry bulb temperature, and humidity ratio.
+     *
+     * @param pressure      The absolute pressure of the humid air in pascals (Pa).
+     * @param temperature   The dry bulb temperature of the humid air in degrees Celsius (°C).
+     * @param humidityRatio The humidity ratio of the humid air in kilograms of water vapor per kilogram of dry air (kg/kg).
+     */
+    public HumidAir(Pressure pressure,
+                    Temperature temperature,
+                    HumidityRatio humidityRatio,
+                    Pressure satPressure) {
 
         CommonValidators.requireNotNull(pressure);
         CommonValidators.requireNotNull(temperature);
@@ -57,7 +71,6 @@ public class HumidAir implements Fluid {
         CommonValidators.requireBetweenBoundsInclusive(pressure, PRESSURE_MIN_LIMIT, PRESSURE_MAX_LIMIT);
         CommonValidators.requireBetweenBoundsInclusive(temperature, TEMPERATURE_MIN_LIMIT, TEMPERATURE_MAX_LIMIT);
         CommonValidators.requireBetweenBoundsInclusive(humidityRatio, HumidityRatio.HUM_RATIO_MIN_LIMIT, HUMIDITY_RATIO_MAX_LIMIT);
-        Pressure satPressure = HumidAirEquations.saturationPressure(temperature);
         FluidValidators.requireValidSaturationPressure(satPressure, pressure, temperature);
 
         this.pressure = pressure;
@@ -65,13 +78,13 @@ public class HumidAir implements Fluid {
         this.humidityRatio = humidityRatio;
         this.saturationPressure = satPressure;
         this.density = HumidAirEquations.density(temperature, humidityRatio, pressure);
-        this.relativeHumidity = HumidAirEquations.relativeHumidity(temperature, humidityRatio, pressure);
+        this.relativeHumidity = HumidAirEquations.relativeHumidityFromPs(humidityRatio, pressure, satPressure);
         this.maxHumidityRatio = HumidAirEquations.maxHumidityRatio(saturationPressure, pressure);
         this.vapourState = determineVapourState(temperature, humidityRatio, maxHumidityRatio);
         this.wetBulbTemperature = HumidAirEquations.wetBulbTemperature(temperature, relativeHumidity, pressure);
         this.dewPointTemperature = HumidAirEquations.dewPointTemperature(temperature, relativeHumidity, pressure);
         this.specificHeat = HumidAirEquations.specificHeat(temperature, humidityRatio);
-        this.specificEnthalpy = HumidAirEquations.specificEnthalpy(temperature, humidityRatio, pressure);
+        this.specificEnthalpy = HumidAirEquations.specificEnthalpy(temperature, humidityRatio, pressure, saturationPressure);
         this.dynamicViscosity = HumidAirEquations.dynamicViscosity(temperature, humidityRatio);
         this.kinematicViscosity = HumidAirEquations.kinematicViscosity(temperature, humidityRatio, density);
         this.thermalConductivity = HumidAirEquations.thermalConductivity(temperature, humidityRatio);
@@ -323,7 +336,7 @@ public class HumidAir implements Fluid {
         Pressure satPressure = HumidAirEquations.saturationPressure(dryBulbTemperature);
         FluidValidators.requireValidSaturationPressure(satPressure, pressure, dryBulbTemperature);
         HumidityRatio humRatio = HumidAirEquations.humidityRatio(relativeHumidity, satPressure, pressure);
-        return new HumidAir(pressure, dryBulbTemperature, humRatio);
+        return new HumidAir(pressure, dryBulbTemperature, humRatio, satPressure);
     }
 
     /**

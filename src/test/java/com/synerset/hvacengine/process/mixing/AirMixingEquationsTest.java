@@ -59,7 +59,8 @@ class AirMixingEquationsTest {
         assertThat(actualOutDryAirMassFlow.getInKilogramsPerSecond()).isEqualTo(mda_out);
         assertThat(actualOutHumidityRatio).isEqualTo(expectedHumidityRatio);
         assertThat(actualOutAirTemp).isEqualTo(expectedOutTemp);
-        assertThat(mixingResult.freshAirRatio()).isEqualTo(Ratio.ofPercentage(50));
+        assertThat(mixingResult.dryAirMassFreshAirRatio()).isEqualTo(Ratio.ofPercentage(50));
+        assertThat(mixingResult.humidAirVolFreshAirRatio()).isEqualTo(Ratio.ofDecimal(0.4601020541604994));
     }
 
     @Test
@@ -84,7 +85,8 @@ class AirMixingEquationsTest {
         assertThat(actualOutletFlow.getTemperature()).isEqualTo(expectedTemp);
         assertThat(actualOutletFlow.getRelativeHumidity().getInPercent()).isEqualTo(expectedRH.getInPercent(), withPrecision(1E-11));
         assertThat(actualOutletFlow.getDryAirMassFlow()).isEqualTo(expectedDryAirMassFlow);
-        assertThat(mixingResult.freshAirRatio()).isEqualTo(Ratio.ofPercentage(36.10289482757949));
+        assertThat(mixingResult.dryAirMassFreshAirRatio()).isEqualTo(Ratio.ofPercentage(36.10289482757949));
+        assertThat(mixingResult.humidAirVolFreshAirRatio()).isEqualTo(Ratio.ofDecimal(0.33336424043131485));
     }
 
 }

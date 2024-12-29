@@ -68,7 +68,7 @@ class MixingBlockTest {
         assertThat(actualMixingFlows).hasSize(1);
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
         assertThat(processResults.processMode()).isEqualTo(MixingMode.SIMPLE_MIXING);
-        assertThat(processResults.freshAirRatio()).isEqualTo(Ratio.ofPercentage(40.11989227594873));
+        assertThat(processResults.dryAirMassFreshAirRatio()).isEqualTo(Ratio.ofPercentage(40.11989227594873));
 
         FlowOfHumidAir outletAirFlow = processResults.outletAirFlow();
         assertThat(outletAirFlow.getPressure()).isEqualTo(inletAir.getPressure());
@@ -129,7 +129,7 @@ class MixingBlockTest {
         MixingResult processResults = mixingBlock.runProcessCalculations();
         assertThat(processResults.processType()).isEqualTo(ProcessType.MIXING);
         assertThat(processResults.processMode()).isEqualTo(MixingMode.MULTIPLE_MIXING);
-        assertThat(processResults.freshAirRatio()).isEqualTo(Ratio.ofPercentage(33.40744717861534));
+        assertThat(processResults.dryAirMassFreshAirRatio()).isEqualTo(Ratio.ofPercentage(33.40744717861534));
         // Then
         assertThat(processResults).isNotNull();
         assertThat(processResults.outletAirFlow()).isNotNull();
